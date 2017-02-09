@@ -3,10 +3,10 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "digitalhub_databaseAccount_name": {
-            "value": "digitalhubprd"
+            "value": "digitalhubstg"
         },
         "digitalhub_storageAccount_name": {
-            "value": "digitalhubprd"
+            "value": "digitalhubstg"
         }
     }
 }
