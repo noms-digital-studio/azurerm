@@ -2,10 +2,7 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "digitalhub_databaseAccount_name": {
-            "type": "String"
-        },
-        "digitalhub_storageAccount_name": {
+        "digitalhub_environment": {
             "type": "String"
         }
     },
@@ -15,7 +12,7 @@
             "comments": "NoSQL Database for Hub",
             "type": "Microsoft.DocumentDB/databaseAccounts",
             "kind": "MongoDB",
-            "name": "[parameters('digitalhub_databaseAccount_name')]",
+            "name": "[concat('digitalhub', parameters('digitalhub_environment'))]",
             "apiVersion": "2015-04-08",
             "location": "UK West",
             "tags": {},
@@ -38,7 +35,7 @@
                 "tier": "Standard"
             },
             "kind": "BlobStorage",
-            "name": "[parameters('digitalhub_storageAccount_name')]",
+            "name": "[concat('digitalhub', parameters('digitalhub_environment'))]",
             "apiVersion": "2016-01-01",
             "location": "ukwest",
             "tags": {},
