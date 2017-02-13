@@ -1,0 +1,56 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "digitalhub_environment": {
+            "type": "String"
+        },
+        "tagvalues": {
+            "type": "object",
+            "defaultValue": {
+                "Service": "Digital Hub",
+                "Environment": "[parameters('digitalhub_environment')]"
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "comments": "NoSQL Database for Hub",
+            "type": "Microsoft.DocumentDB/databaseAccounts",
+            "kind": "MongoDB",
+            "name": "[concat('digitalhub', parameters('digitalhub_environment'))]",
+            "apiVersion": "2015-04-08",
+            "location": "UK West",
+            "tags": "[parameters('tagvalues')]",
+            "properties": {
+                "databaseAccountOfferType": "Standard",
+                "consistencyPolicy": {
+                    "defaultConsistencyLevel": "Session",
+                    "maxIntervalInSeconds": 5,
+                    "maxStalenessPrefix": 100
+                }
+            },
+            "resources": [],
+            "dependsOn": []
+        },
+        {
+            "comments": "Storage account for the Hub.",
+            "type": "Microsoft.Storage/storageAccounts",
+            "sku": {
+                "name": "Standard_GRS",
+                "tier": "Standard"
+            },
+            "kind": "BlobStorage",
+            "name": "[concat('digitalhub', parameters('digitalhub_environment'))]",
+            "apiVersion": "2016-01-01",
+            "location": "ukwest",
+            "tags": "[parameters('tagvalues')]",
+            "properties": {
+                "accessTier": "Hot"
+            },
+            "resources": [],
+            "dependsOn": []
+        }
+    ]
+}
