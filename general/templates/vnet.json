@@ -1,0 +1,95 @@
+{
+  "$schema":  "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion":  "1.0.0.0",
+  "parameters":  {
+    "vnet-name": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of VNET"
+            }
+    },
+    "vnet-CIDR": {
+      "type": "string",
+      "metadata": {
+        "description": "CIDR for VNET - Provided by Platform Team"
+            }
+    },
+    "subnet-name": {
+      "type": "string",
+      "metadata": {
+        "description": "subnet name - Provided by Platform Team"
+            }
+    },
+    "subnet-prefix": {
+      "type": "string",
+      "metadata": {
+        "description": "subnet prefix - Provided by Platform Team"
+            }
+    },
+    "nsg-name": {
+      "type": "string",
+      "metadata": {
+        "description": "subnet prefix - Provided by Platform Team"
+            }
+    }
+    },
+    "variables": {
+    "networkApiVersion": "2016-07-01",
+    "securityGroupsApiVersion": "2015-06-15",
+    "VNetID": "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnet-name'))]",
+    },
+
+    "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('vnet-name')]",
+      "apiVersion": "[variables('networkApiVersion')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('vnet-CIDR')]"
+          ]
+        },
+        "subnets":[
+          {
+            "name": "[parameters('subnet-name')]",
+              "properties": {
+                "addressPrefix": "[parameters('subnet-prefix')]",
+                "networkSecurityGroup": {
+                  "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsg-name'))]"
+                }
+              }
+          }
+          ]
+       }
+      },
+     {
+      "apiVersion": "[variables('securityGroupsApiVersion')]",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('mgmt-pub-sub-nsg-name')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "Allow_SSH",
+            "properties": {
+              "description": "Rule to allow SSH access",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "[variables('kainosBelfastIP')]",
+              "destinationAddressPrefix": "[variables('mgmt-pub-sub-cidr')]",
+              "access": "Allow",
+              "priority": 10,
+              "direction": "Inbound"
+            }
+          
+
+          }
+        ]
+        }
+      }    
+    ]
+
+}
