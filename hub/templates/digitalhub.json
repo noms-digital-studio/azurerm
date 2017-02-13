@@ -4,6 +4,13 @@
     "parameters": {
         "digitalhub_environment": {
             "type": "String"
+        },
+        "tagvalues": {
+            "type": "object",
+            "defaultValue": {
+                "Service": "Digital Hub",
+                "Environment": "[parameters('digitalhub_environment')]"
+            }
         }
     },
     "variables": {},
@@ -15,10 +22,7 @@
             "name": "[concat('digitalhub', parameters('digitalhub_environment'))]",
             "apiVersion": "2015-04-08",
             "location": "UK West",
-            "tags": {
-                "service": "Digital Hub",
-                "environment": "[parameters('digitalhub_environment')]"
-                },
+            "tags": "[parameters('tagvalues')]",
             "properties": {
                 "databaseAccountOfferType": "Standard",
                 "consistencyPolicy": {
@@ -41,10 +45,7 @@
             "name": "[concat('digitalhub', parameters('digitalhub_environment'))]",
             "apiVersion": "2016-01-01",
             "location": "ukwest",
-            "tags": {
-                "service": "Digital Hub",
-                "environment": "[parameters('digitalhub_environment')]"
-                },
+            "tags": "[parameters('tagvalues')]",
             "properties": {
                 "accessTier": "Hot"
             },
