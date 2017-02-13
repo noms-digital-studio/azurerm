@@ -15,7 +15,10 @@
             "name": "[concat('digitalhub', parameters('digitalhub_environment'))]",
             "apiVersion": "2015-04-08",
             "location": "UK West",
-            "tags": {},
+            "tags": {
+                "service": "Digital Hub",
+                "environment": "[parameters('digitalhub_environment')]"
+                },
             "properties": {
                 "databaseAccountOfferType": "Standard",
                 "consistencyPolicy": {
@@ -38,7 +41,10 @@
             "name": "[concat('digitalhub', parameters('digitalhub_environment'))]",
             "apiVersion": "2016-01-01",
             "location": "ukwest",
-            "tags": {},
+            "tags": {
+                "service": "Digital Hub",
+                "environment": "[parameters('digitalhub_environment')]"
+                },
             "properties": {
                 "accessTier": "Hot"
             },
