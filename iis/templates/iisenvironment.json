@@ -1,0 +1,129 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "iis_environment": {
+            "type": "String"
+        },
+        "tagvalues": {
+            "type": "object",
+            "defaultValue": {
+                "Service": "IIS",
+                "Environment": "[parameters('iis_environment')]"
+            }
+        },
+        "adminUsername": {
+            "type": "String"
+        }
+    },
+    "variables": {
+        "vnet-name": "[concat('vnet-iis-', parameters('iis_environment'))]",
+        "vnet-cidr": "",
+        "sqlvmsize": "Standard_DS1",
+        "sql-paas-tier": "tbd",
+        "sql-collation": "SQL_Latin1_General_CP1_CI_AS",
+        "sqldb-default-admin-user": "tbd",
+        "sql-server-nic-name": "[concat('sql-nic-iis-' parameters('iis_environment))]",
+        "sql-server-name": "[concat('sql-nic-iis-' parameters('iis_environment))]",
+        },
+    "resources": [
+        {
+            "comments": "Storage account for IIS.",
+            "type": "Microsoft.Storage/storageAccounts",
+            "sku": {
+                "name": "Standard_GRS",
+                "tier": "Standard"
+            },
+            "kind": "BlobStorage",
+            "name": "[concat('iis-', parameters('iis_environment'))]",
+            "apiVersion": "2016-01-01",
+            "location": "ukwest",
+            "tags": "[parameters('tagvalues')]",
+            "properties": {
+                "accessTier": "Hot",
+                "encryption": {
+                    "keySource": "Microsoft.Storage",
+                    "services": {
+                        "blob": {
+                            "enabled": true
+                        }
+                    }
+                }
+            },
+            "resources": [],
+            "dependsOn": []
+        },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('sql-server-nic-name')]",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "[variables('networkApiVersion')]",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "default-ip-config",
+            "properties": {
+              "privateIPAddress": "[variables('sql-iis-priv-ip')]",
+              "privateIPAllocationMethod": "Static",
+              "subnet": {
+                "id": "[variables('sql-iis-sub-ref')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[variables('sql-server-name')]",
+      "apiVersion": "[variables('vmApiVersion')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+          "hardwareProfile": {
+              "vmSize": "[variables('standardVMSize')]"
+          },
+          "storageProfile": {
+              "imageReference": {
+                "publisher": "MicrosoftSQLServer",
+                "offer": "SQL2016SP1-WS2016",
+                "sku": "Standard",
+                "version": "latest"
+                },
+              "osDisk": {
+                  "name": "[variables('vmBaseTemplate')]",
+                  "osType": "Windows",
+                  "createOption": "fromImage",
+                  "image": {
+                      "uri": "[variables('vmBaseTemplateImageURI')]"
+                  },
+                  "vhd": {
+                      "uri": "[concat('http://',variables('mgmtStorageAccount'),'.blob.core.windows.net/', 'vhds', '-' ,variables('environmentName'), '/',variables('sql-server-name'),'.vhd')]"
+                  },
+                  "caching": "ReadWrite"
+              },
+              "dataDisks": []
+          },
+           "osProfile": {
+             "computerName": "[parameters('virtualMachineName')]",
+             "adminUsername": "[parameters('adminUsername')]",
+             "adminPassword": "[parameters('adminPassword')]",
+             "windowsConfiguration": {
+             "provisionVmAgent": "true"
+              }
+            },
+          "networkProfile": {
+              "networkInterfaces": [
+                  {
+                    "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('sql-server-nic-name'))]"
+                  }
+              ]
+          }
+      },
+      "dependsOn": [
+          "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+          "[concat('Microsoft.Network/networkInterfaces/', variables('sql-server-nic-name'))]"
+        ]
+    },
+
+    ]
+}
