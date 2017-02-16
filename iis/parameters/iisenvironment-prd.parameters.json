@@ -1,0 +1,69 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environment-tag": {
+            "value": "production"
+        },
+        "service-tag": {
+            "value": "iis"
+        },
+        "adminUsername": {
+            "value": "iisadmin"
+        },
+        "adminPassword": {
+            "value": "blahblahblah"
+        },
+        "sql-vm-size": {  
+            "value": "Standard_DS4_v2"
+        },
+        "vm-storage-account-type": {
+            "value": "Standard_LRS"
+        },
+        "sqlAutopatchingDayOfWeek": {
+            "value": "Sunday"
+        },
+        "sqlAutopatchingStartHour": {
+            "value": "2"
+        },
+        "sqlAutopatchingWindowDuration": {
+            "value": "60"
+        },
+        "sqldb-admin-password": {
+            "value": "blahblahblah"
+        },
+        "paas-sqlAuthenticationLogin": {
+            "value": "iis-paas-sql-admin"
+        }, 
+        "paas-sqlAuthenticationPassword": {
+            "value": "blahblahblah"
+        },
+        "vnetPrefix": {
+            "value": "10.0.0.0/16"
+        },
+        "sqlsubnetPrefix": {
+            "value": "10.0.0.0/24"
+        },
+        "sqlConnectivityType": {
+            "value": "Public"
+        },
+        "sqlPortNumber": {
+            "value": 1579
+        },
+        "sqlStorageDisksCount": {
+            "value": 2
+        },
+        "sqlStorageWorkloadType": {
+            "value": "GENERAL"
+        },
+        "sqlAutopatchingDayOfWeek": {
+            "value": "Sunday"
+        },
+        "sqlAutopatchingStartHour": {
+            "value": "2"
+        },
+        "sqlAutopatchingWindowDuration": {
+            "value": "60"
+        }
+    }
+}
