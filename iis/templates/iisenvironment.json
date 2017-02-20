@@ -278,9 +278,12 @@
               {
                 "name": "[variables('sql-subnet-name')]",
                 "properties": {
-                  "addressPrefix": "[parameters('sqlsubnetPrefix')]"
+                  "addressPrefix": "[parameters('sqlsubnetPrefix')]",
+                "networkSecurityGroup": {
+                  "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'sql-network-security-group-name')]"
+                  }
                 }
-              },
+              }
             ]
           }
         },
@@ -290,7 +293,7 @@
           "location": "[resourceGroup().location]",
           "apiVersion": "[variables('networkApiVersion')]",
           "dependsOn": [
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnet-name'))]",
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnet-name'))]"
             ],
           "properties": {
             "ipConfigurations": [
@@ -372,7 +375,7 @@
               "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('sql-server-nic-name'))]"
             }
           ]
-        },
+        }
       },
         "resources": [
         {
@@ -382,12 +385,12 @@
             "apiVersion": "2015-05-01-preview",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/', variables('sql-server-name'))]",
-                "[concat('Microsoft.Storage/storageAccounts/', variables('diagnostic-storage-account-name'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('diagnostic-storage-account-name'))]"
             ],
             "tags": {
                 "displayName": "AzureDiagnostics",
                 "Environment": "[parameters('environment-tag')]",
-                "Service": "[parameters('service-tag')]",
+                "Service": "[parameters('service-tag')]"
             },
             "properties": {
                 "publisher": "Microsoft.Azure.Diagnostics",
@@ -487,6 +490,44 @@
             "value": "PrepareSqlServerSa.ps1\\PrepareSqlServerSa"
           }
         }
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2016-10-01",
+      "name": "sql-network-security-group-name",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "allowInboundSSH",
+            "properties": {
+              "description": "Allow inbound SSH",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "Internet",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "denyall",
+            "properties": {
+              "description": "Allow inbound SSH",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "Internet",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 4000,
+              "direction": "Inbound"
+            }
+          }
+        ]
       }
     },
     {
