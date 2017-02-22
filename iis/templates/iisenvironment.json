@@ -653,6 +653,36 @@
       }
     },
     {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(variables('sql-server-name'), '/malware)]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('sql-server-name'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Security",
+        "type": "IaaSAntimalware",
+        "typeHandlerVersion": "1.1",
+        "settings": {
+          "AntimalwareEnabled": "true",
+          "Exclusions": {
+            "Paths": "C:\\Users",
+            "Extensions": ".txt",
+            "Processes": "taskmgr.exe"
+          },
+          "RealtimeProtectionEnabled": "true",
+          "ScheduledScanSettings": {
+            "isEnabled": "true",
+            "scanType": "Quick",
+            "day": "7",
+            "time": "120"
+          }
+        },
+        "protectedSettings": null
+      }
+    },
+    {
       "type": "Microsoft.Resources/deployments",
       "name": "prepareSqlVmDeployment",
       "apiVersion": "2016-02-01",
