@@ -1,0 +1,803 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "objectId": {
+          "type": "string",
+          "metadata": {
+            "description": "Object Id of the AD user. Get using Get-AzureRmADUser or Get-AzureRmADServicePrincipal cmdlets"
+          }
+        },
+        "environment-tag": {
+            "type": "String"
+        },
+        "service-tag": {
+            "type": "string"
+        },
+        "adminUsername": {
+            "type": "String"
+        },
+        "adminPassword": {
+            "type": "securestring"
+        },
+        "jumpboxAdminUsername": {
+            "type": "String"
+        },
+        "sshUserName": {
+            "type": "String"
+        },
+        "jumpboxAdminPassword": {
+            "type": "secureString"
+        },
+        "ubuntuOSVersion": {
+          "type": "string",
+          "defaultValue": "16.04.0-LTS",
+          "allowedValues": [
+            "12.04.5-LTS",
+            "14.04.5-LTS",
+            "15.10",
+            "16.04.0-LTS"
+          ],
+          "metadata": {
+            "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
+          }
+        },
+        "adminsshpublickey": {
+            "type": "securestring"
+        },
+        "digital-Studio-Public-IP": {
+          "type": "string"
+        },
+        "sql-vm-size": {
+            "type": "string",
+            "metadata": {
+            "description": "SQL Server Virtual Machine Size"
+            },
+            "allowedValues": [
+            "Standard_DS1_v2",
+            "Standard_DS2_v2",
+            "Standard_DS3_v2",
+            "Standard_DS4_v2",
+            "Standard_DS11_v2",
+            "Standard_DS12_v2",
+            "Standard_DS13_v2",
+            "Standard_DS14_v2"
+        ],
+        "defaultValue": "Standard_DS4_v2"
+        },
+        "vm-storage-account-type": {
+            "type": "string",
+            "metadata": {
+            "description": "SQL Server Virtual Machine Storage Account Type"
+            },
+            "allowedValues": [
+            "Premium_LRS",
+            "Standard_LRS"
+            ],
+            "defaultValue": "Standard_LRS"
+        },
+        "sqlAutopatchingDayOfWeek": {
+          "type": "string",
+          "metadata": {
+            "description": "SQL Server Auto Patching Day of A Week"
+          },
+          "allowedValues": [
+            "Everyday",
+            "Never",
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday"
+          ],
+          "defaultValue": "Sunday"
+        },
+        "sqlAutopatchingStartHour": {
+          "type": "string",
+          "metadata": {
+            "description": "SQL Server Auto Patching Starting Hour"
+          },
+          "allowedValues": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23"
+          ],
+          "defaultValue": "2"
+        },
+        "sqlAutopatchingWindowDuration": {
+          "type": "string",
+          "metadata": {
+            "description": "SQL Server Auto Patching Duration Window in minutes"
+          },
+          "allowedValues": [
+            "30",
+            "60",
+            "90",
+            "120",
+            "150",
+            "180"
+          ],
+          "defaultValue": "60"
+        },
+        "sqldb-admin-password": {
+            "type": "securestring"
+        },
+        "paas-sqlAuthenticationLogin": {
+            "type": "string"
+        },
+        "paas-sqlAuthenticationPassword": {
+            "type": "securestring"
+        },
+        "vnetPrefix": {
+          "type": "string",
+          "metadata": {
+            "description": "VNET prefix"
+          },
+          "defaultValue": "10.0.0.0/24"
+        },
+        "sqlsubnetPrefix": {
+          "type": "string",
+          "metadata": {
+            "description": "SQL Server Virtual Machine Subnet Name"
+          },
+          "defaultValue": "10.0.0.0/30"
+        },
+        "publicIpAddressType": {
+          "type": "string",
+          "metadata": {
+            "description": "SQL Server Virtual Machine Public IP Address Type"
+          },
+          "defaultValue": "Dynamic"
+        },
+        "sqlConnectivityType": {
+          "type": "string",
+          "metadata": {
+            "description": "SQL Server Virtual Machine SQL Connectivity Type"
+          },
+          "defaultValue": "Public"
+        },
+        "sqlPortNumber": {
+          "type": "int",
+          "metadata": {
+            "description": "SQL Server Virtual Machine SQL Port Number"
+          },
+          "defaultValue": 1579
+        },
+        "sqlStorageDisksCount": {
+          "type": "int",
+          "metadata": {
+            "description": "SQL Server Virtual Machine Data Disk Count"
+          },
+          "defaultValue": 2
+        },
+        "sqlStorageWorkloadType": {
+          "type": "string",
+          "metadata": {
+            "description": "SQL Server Virtual Machine Workload Type: GENERAL - general work load; DW - datawear house work load; OLTP - Transactional processing work load"
+          },
+          "allowedValues": [
+            "GENERAL",
+            "OLTP",
+            "DW"
+          ],
+          "defaultValue": "GENERAL"
+        },
+    },
+    "variables": {
+        "diagnostic-storage-account-name": "[concat('joetest', parameters('service-tag'), 'logs', parameters('environment-tag'))]",
+        "diagnostic-storage-account-id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/',resourceGroup().Name, '/providers/','Microsoft.Storage/storageAccounts/', variables('diagnostic-storage-account-name'))]",
+        "vnet-name": "[concat('vnet-iis-', parameters('environment-tag'))]",
+        "networkApiVersion": "2015-06-15",
+        "sql-subnet-name": "[concat('sql-subnet-iis-', parameters('environment-tag'))]",
+        "sql-network-security-group-name": "[concat('nsg-sql-iis-', parameters('environment-tag'))]",
+        "networkApiVersion": "2016-07-01",
+        "vnetId": "[resourceId(resourceGroup().Name,'Microsoft.Network/virtualNetworks', variables('vnet-name'))]",
+        "sql-iis-sub-ref": "[concat(variables('vnetId'), '/subnets/', variables('sql-subnet-name'))]",
+        "sqldb-default-admin-user": "[concat('sql-iis-', parameters('environment-tag'), '-admin')]",
+        "sql-server-nic-name": "[concat('sql-nic-iis-', parameters('environment-tag'))]",
+        "jumpbox-pub-ip-name": "[concat('jumpbox-iis-public-ip-', parameters('environment-tag'))]",
+        "jumpbox-nic-name": "[concat('jumpbox-nic-iis-', parameters('environment-tag'))]",
+        "sql-server-name": "sqliisprod",
+        "jumpbox-name": "jmpiisprd",
+        "jumpbox-vm-size": "Standard_DS1_v2",   
+        "jumpbox-dataDisk1VhdName": "datadisk1",
+        "jumpbox-imagePublisher": "Canonical",
+        "jumpbox-imageOffer": "UbuntuServer",
+        "jumpbox-OSDiskName": "osdiskforlinuxsimple",
+        "sql-public-Ip-Address-Name": "[concat('sql-public-ip-iis-', parameters('environment-tag'))]",
+        "sql-iis-priv-ip": "10.0.0.10",
+        "jumpbox-priv-ip": "10.0.0.101",
+        "paas-sql-name": "[concat('sql-paas-iis-', parameters('environment-tag'))]",
+        "paas-sql-db-name": "IIS",
+        "paas-sql-db-collation": "SQL_Latin1_General_CP1_CI_AS",
+        "paas-sql-db-edition": "Standard",
+        "paas-sql-db-requested-service-objective-name": "S0",
+        "sqlApiVersion": "2014-04-01-preview",
+        "paas-sqldb-default-admin-user": "[concat('sql-paas-iis-', parameters('environment-tag'), '-admin')]",
+
+            
+        "metricsresourceid": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name ,'/providers/','Microsoft.Compute/virtualMachines/',variables('sql-server-name'))]",
+        "wadlogs": "<WadCfg> <DiagnosticMonitorConfiguration overallQuotaInMB=\"4096\" xmlns=\"http://schemas.microsoft.com/ServiceHosting/2010/10/DiagnosticsConfiguration\"> <DiagnosticInfrastructureLogs scheduledTransferLogLevelFilter=\"Error\"/> <WindowsEventLog scheduledTransferPeriod=\"PT1M\" > <DataSource name=\"Application!*[System[(Level = 1 or Level = 2)]]\" /> <DataSource name=\"Security!*[System[(Level = 1 or Level = 2)]]\" /> <DataSource name=\"System!*[System[(Level = 1 or Level = 2)]]\" /></WindowsEventLog>",
+        "wadperfcounters": "<PerformanceCounters scheduledTransferPeriod=\"PT1M\"><PerformanceCounterConfiguration counterSpecifier=\"\\Processor(_Total)\\% Processor Time\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU utilization\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor(_Total)\\% Privileged Time\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU privileged time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor(_Total)\\% User Time\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU user time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor Information(_Total)\\Processor Frequency\" sampleRate=\"PT15S\" unit=\"Count\"><annotation displayName=\"CPU frequency\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\System\\Processes\" sampleRate=\"PT15S\" unit=\"Count\"><annotation displayName=\"Processes\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Process(_Total)\\Thread Count\" sampleRate=\"PT15S\" unit=\"Count\"><annotation displayName=\"Threads\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Process(_Total)\\Handle Count\" sampleRate=\"PT15S\" unit=\"Count\"><annotation displayName=\"Handles\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\% Committed Bytes In Use\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Memory usage\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\Available Bytes\" sampleRate=\"PT15S\" unit=\"Bytes\"><annotation displayName=\"Memory available\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\Committed Bytes\" sampleRate=\"PT15S\" unit=\"Bytes\"><annotation displayName=\"Memory committed\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\Commit Limit\" sampleRate=\"PT15S\" unit=\"Bytes\"><annotation displayName=\"Memory commit limit\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk(_Total)\\% Disk Time\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Disk active time\" locale=\"en-us\"/></PerformanceCounterConfiguration>",
+        "wadperfcounters2": "<PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk(_Total)\\% Disk Read Time\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Disk active read time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk(_Total)\\% Disk Write Time\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Disk active write time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk(_Total)\\Disk Transfers/sec\" sampleRate=\"PT15S\" unit=\"CountPerSecond\"><annotation displayName=\"Disk operations\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk(_Total)\\Disk Reads/sec\" sampleRate=\"PT15S\" unit=\"CountPerSecond\"><annotation displayName=\"Disk read operations\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk(_Total)\\Disk Writes/sec\" sampleRate=\"PT15S\" unit=\"CountPerSecond\"><annotation displayName=\"Disk write operations\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk(_Total)\\Disk Bytes/sec\" sampleRate=\"PT15S\" unit=\"BytesPerSecond\"><annotation displayName=\"Disk speed\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk(_Total)\\Disk Read Bytes/sec\" sampleRate=\"PT15S\" unit=\"BytesPerSecond\"><annotation displayName=\"Disk read speed\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk(_Total)\\Disk Write Bytes/sec\" sampleRate=\"PT15S\" unit=\"BytesPerSecond\"><annotation displayName=\"Disk write speed\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\LogicalDisk(_Total)\\% Free Space\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Disk free space (percentage)\" locale=\"en-us\"/></PerformanceCounterConfiguration></PerformanceCounters>",
+        "wadmetrics": "[concat('<Metrics resourceId=\"',variables('metricsresourceid'),'\"><MetricAggregation scheduledTransferPeriod=\"PT1H\"/><MetricAggregation scheduledTransferPeriod=\"PT1M\"/></Metrics></DiagnosticMonitorConfiguration></WadCfg>')]",
+        "wadcfgx": "[concat(variables('wadlogs'),variables('wadperfcounters'),variables('wadperfcounters2'),variables('wadmetrics'))]"
+    },
+    "resources": [
+    { 
+      "comments": "Storage account for IIS.",
+      "type": "Microsoft.Storage/storageAccounts",
+      "sku": {
+          "name": "Standard_LRS",
+          "tier": "Standard"
+        },
+      "kind": "BlobStorage",
+      "name": "[concat('joetest',parameters('service-tag'), parameters('environment-tag'))]",
+      "apiVersion": "2016-01-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+          "Environment": "[parameters('environment-tag')]",
+          "Service": "[parameters('service-tag')]",
+          "Role": "Other"
+        },
+      "properties": {
+          "accessTier": "Hot",
+          "encryption": {
+              "keySource": "Microsoft.Storage",
+              "services": {
+                    "blob": {
+                      "enabled": true
+                      }
+                  }
+              }
+          },
+        "resources": [],
+        "dependsOn": []
+        },
+        {
+        "comments": "Storage account for IIS Diagnostic Logs.",
+        "type": "Microsoft.Storage/storageAccounts",
+        "sku": {
+            "name": "Standard_LRS",
+            "tier": "Standard"
+          },
+        "kind": "Storage",
+        "name": "[variables('diagnostic-storage-account-name')]",
+        "apiVersion": "2016-01-01",
+        "location": "[resourceGroup().location]",
+        "tags": {
+          "Environment": "[parameters('environment-tag')]",
+          "Service": "[parameters('service-tag')]",
+          "Role": "Other"
+        },
+        "properties": {
+          "encryption": {
+          "keySource": "Microsoft.Storage",
+              "services": {
+              "blob": {
+                "enabled": true
+                  }
+              }
+          }
+        },
+        "resources": [],
+        "dependsOn": []
+        },
+        {
+          "type": "Microsoft.Network/publicIPAddresses",
+          "name": "[variables('jumpbox-pub-ip-name')]",
+          "apiVersion": "[variables('networkApiVersion')]",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "publicIPAllocationMethod": "static"
+          }
+        },
+        {
+          "apiVersion": "[variables('networkapiVersion')]",
+          "type": "Microsoft.Network/virtualNetworks",
+          "name": "[variables('vnet-name')]",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "addressSpace": {
+              "addressPrefixes": [
+                "[parameters('vnetPrefix')]"
+              ]
+            },
+            "subnets": [
+              {
+                "name": "[variables('sql-subnet-name')]",
+                "properties": {
+                  "addressPrefix": "[parameters('sqlsubnetPrefix')]",
+                "networkSecurityGroup": {
+                  "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('sql-network-security-group-name'))]"
+                  }
+                }
+              }
+            ]
+          },
+          "dependsOn": [
+            "[concat('Microsoft.Network/networkSecurityGroups/', variables('sql-network-security-group-name'))]",
+          ]
+        },
+        {
+          "type": "Microsoft.Network/networkInterfaces",
+          "name": "[variables('sql-server-nic-name')]",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "[variables('networkApiVersion')]",
+          "dependsOn": [
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnet-name'))]"
+            ],
+          "properties": {
+            "ipConfigurations": [
+              {
+                "name": "default-ip-config",
+                "properties": {
+                  "privateIPAddress": "[variables('sql-iis-priv-ip')]",
+                  "privateIPAllocationMethod": "Static",
+                  "subnet": {
+                    "id": "[variables('sql-iis-sub-ref')]"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "Microsoft.Network/networkInterfaces",
+          "name": "[variables('jumpbox-nic-name')]",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "[variables('networkApiVersion')]",
+          "dependsOn": [
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnet-name'))]"
+            ],
+          "properties": {
+            "ipConfigurations": [
+              {
+                "name": "default-ip-config",
+                "properties": {
+                  "privateIPAddress": "[variables('jumpbox-priv-ip')]",
+                  "privateIPAllocationMethod": "Static",
+                  "subnet": {
+                    "id": "[variables('sql-iis-sub-ref')]"
+                  },
+                  "publicIPAddress": {
+                    "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('jumpbox-pub-ip-name'))]"
+                  }
+                }
+              }
+            ]
+          }
+        },
+    {
+      "name": "[variables('sql-server-name')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2016-04-30-preview",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Environment": "[parameters('environment-tag')]",
+        "Service": "[parameters('service-tag')]",
+        "Role": "DB"
+        },
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkInterfaces/', variables('sql-server-nic-name'))]"
+      ],
+      "properties": {
+        "osProfile": {
+          "computerName": "[variables('sql-server-name')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]",
+          "windowsConfiguration": {
+            "provisionVmAgent": "true"
+          }
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('sql-vm-size')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftSQLServer",
+            "offer": "SQL2014SP1-WS2012R2",
+            "sku": "Enterprise",
+            "version": "latest"
+          },
+          "osDisk": {
+            "createOption": "FromImage",
+            "managedDisk": {
+              "storageAccountType": "[parameters('vm-storage-account-type')]"
+            }
+          },
+          "dataDisks": [
+            {
+              "createOption": "Empty",
+              "lun": 0,
+              "diskSizeGB": "1023",
+              "caching": "ReadOnly",
+              "managedDisk": {
+                "storageAccountType": "[parameters('vm-storage-account-type')]"
+              }
+            },
+            {
+              "createOption": "Empty",
+              "lun": 1,
+              "diskSizeGB": "1023",
+              "caching": "ReadOnly",
+              "managedDisk": {
+                "storageAccountType": "[parameters('vm-storage-account-type')]"
+              }
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('sql-server-nic-name'))]"
+            }
+          ]
+        }
+      },
+        "resources": [
+        {
+            "name": "Microsoft.Insights.VMDiagnosticsSettings",
+            "type": "extensions",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-05-01-preview",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', variables('sql-server-name'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('diagnostic-storage-account-name'))]"
+            ],
+            "tags": {
+                "displayName": "AzureDiagnostics",
+                "Environment": "[parameters('environment-tag')]",
+                "Service": "[parameters('service-tag')]"
+            },
+            "properties": {
+                "publisher": "Microsoft.Azure.Diagnostics",
+                "type": "IaaSDiagnostics",
+                "typeHandlerVersion": "1.4",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "xmlCfg": "[base64(variables('wadcfgx'))]",
+                    "storageAccount": "[variables('diagnostic-storage-account-name')]"
+                },
+                "protectedSettings": {
+                    "storageAccountName": "[variables('diagnostic-storage-account-name')]",
+                    "storageAccountKey": "[listkeys(variables('diagnostic-storage-account-id'), '2015-05-01-preview').key1]",
+                    "storageAccountEndPoint": "https://core.windows.net"
+                }
+            }
+        }
+      ]
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(variables('sql-server-name'), '/SqlIaasExtension')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('sql-server-name'))]"
+      ],
+      "properties": {
+        "type": "SqlIaaSAgent",
+        "publisher": "Microsoft.SqlServer.Management",
+        "typeHandlerVersion": "1.2",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "AutoTelemetrySettings": {
+            "Region": "[resourceGroup().location]"
+          },
+          "AutoPatchingSettings": {
+            "PatchCategory": "WindowsMandatoryUpdates",
+            "Enable": true,
+            "DayOfWeek": "[parameters('sqlAutopatchingDayOfWeek')]",
+            "MaintenanceWindowStartingHour": "[parameters('sqlAutopatchingStartHour')]",
+            "MaintenanceWindowDuration": "[parameters('sqlAutopatchingWindowDuration')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(variables('sql-server-name'), '/malware')]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('sql-server-name'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Security",
+        "type": "IaaSAntimalware",
+        "typeHandlerVersion": "1.1",
+        "settings": {
+          "AntimalwareEnabled": "true",
+          "Exclusions": {
+            "Paths": "C:\\Users",
+            "Extensions": ".txt",
+            "Processes": "taskmgr.exe"
+          },
+          "RealtimeProtectionEnabled": "true",
+          "ScheduledScanSettings": {
+            "isEnabled": "true",
+            "scanType": "Quick",
+            "day": "7",
+            "time": "120"
+          }
+        },
+        "protectedSettings": null
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "name": "prepareSqlVmDeployment",
+      "apiVersion": "2016-02-01",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('sql-server-name'), '/extensions/SqlIaasExtension')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-vm-sql-full-autopatching/nested/preparingSqlServerSa.json"
+        },
+        "parameters": {
+          "location": {
+            "value": "[resourceGroup().location]"
+          },
+          "sqlVMName": {
+            "value": "[variables('sql-server-name')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "sqlUsername": {
+            "value": "[variables('sqldb-default-admin-user')]"
+          },
+          "sqlPassword": {
+            "value": "[parameters('sqldb-admin-password')]"
+          },
+          "disksCount": {
+            "value": "[parameters('sqlStorageDisksCount')]"
+          },
+          "diskSizeInGB": {
+            "value": 1023
+          },
+          "sqlEnginePort": {
+            "value": "[parameters('sqlPortNumber')]"
+          },
+          "workloadType": {
+            "value": "[parameters('sqlStorageWorkloadType')]"
+          },
+          "connectionType": {
+            "value": "[parameters('sqlConnectivityType')]"
+          },
+          "sqlVMPrepareModulesURL": {
+            "value": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-vm-sql-full-autopatching/scripts/PrepareSqlServer.ps1.zip"
+          },
+          "sqlVMPrepareConfigurationFunction": {
+            "value": "PrepareSqlServerSa.ps1\\PrepareSqlServerSa"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2016-04-30-preview",
+      "name": "[variables('jumpbox-name')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces/', variables('jumpbox-nic-name'))]"
+      ],
+      "tags": {
+        "Environment": "[parameters('environment-tag')]",
+        "Service": "[parameters('service-tag')]",
+        "Role": "Other"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('jumpbox-vm-size')]"
+        },
+        "osProfile": {
+          "computerName": "[variables('jumpbox-name')]",
+          "adminUsername": "[parameters('sshUserName')]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": "true",
+            "ssh": {
+              "publicKeys": [
+                {
+                  "path": "[concat('/home/', parameters('sshUserName'), '/.ssh/authorized_keys')]",
+                  "keyData": "[parameters('adminsshpublickey')]"
+                }
+              ]
+            }
+          }
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('jumpbox-imagePublisher')]",
+            "offer": "[variables('jumpbox-imageOffer')]",
+            "sku": "[parameters('ubuntuOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "diskSizeGB": "1023",
+              "lun": 0,
+              "createOption": "Empty"
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('jumpbox-nic-name'))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+    "type": "Microsoft.Compute/virtualMachines/extensions",
+    "name": "[concat(variables('jumpbox-name'), '/diagnosticExtensions')]",
+    "apiVersion": "2015-06-15",
+    "location": "[resourceGroup().location]",
+    "dependsOn": [
+      "[concat('Microsoft.Compute/virtualMachines/', variables('jumpbox-name'))]"
+    ],
+    "properties": {
+      "publisher": "Microsoft.OSTCExtensions",
+      "type": "LinuxDiagnostic",
+      "typeHandlerVersion": "2.3",
+      "settings": {
+         "perfCfg":[
+            {
+              "query":"SELECT UsedMemory,AvailableMemory FROM SCX_MemoryStatisticalInformation","table":"Memory"
+            }
+          ],
+          "enableSyslog": "true"
+      },
+      "protectedSettings": {
+        "storageAccountName": "[variables('diagnostic-storage-account-id')]",
+        "storageAccountKey": "[listkeys(variables('diagnostic-storage-account-id'), '2015-05-01-preview').key1]"
+      }
+    }
+  },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2016-10-01",
+      "name": "[variables('sql-network-security-group-name')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "allowInboundSSH_from_Digital_studio",
+            "properties": {
+              "description": "Allow inbound SSH",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "[parameters('digital-Studio-Public-IP')]",
+              "destinationAddressPrefix": "[variables('jumpbox-priv-ip')]",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "allowRDP_from_Jumpbox_to_SQL",
+            "properties": {
+              "description": "Allow RDP from Jumpbox to SQL Server for Administration",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "[variables('jumpbox-priv-ip')]",
+              "destinationAddressPrefix": "[variables('sql-iis-priv-ip')]",
+              "access": "Allow",
+              "priority": 101,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "denyall",
+            "properties": {
+              "description": "Deny All Inbound",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "Internet",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 4000,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers",
+      "name": "[variables('paas-sql-name')]",
+      "apiVersion": "[variables('sqlApiVersion')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "administratorLogin": "[parameters('paas-sqlAuthenticationLogin')]",
+        "administratorLoginPassword": "[parameters('paas-sqlAuthenticationPassword')]",
+        "version": "12.0"
+        },
+      "resources": [
+        {
+          "type": "databases",
+          "name": "[variables('paas-sql-db-name')]",
+          "apiVersion": "[variables('sqlApiVersion')]",
+          "tags": {
+            "Environment": "[parameters('environment-tag')]",
+            "Service": "[parameters('service-tag')]",
+            "Role": "DB"
+            },
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[variables('paas-sql-name')]"
+            ],
+          "properties": {
+            "edition": "[variables('paas-sql-db-edition')]",
+            "collation": "[variables('paas-sql-db-collation')]",
+            "requestedServiceObjectiveName": "[variables('paas-sql-db-requested-service-objective-name')]"
+          },
+          "resources": [
+            {
+              "type": "transparentDataEncryption",
+              "name": "current",
+              "apiVersion": "2014-04-01",
+              "location": null,
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('paas-sql-name'), variables('paas-sql-db-name'))]"
+              ],
+              "properties": {
+                "status": "Enabled"
+             }
+           }
+         ]
+        },
+        {
+          "name": "AllowAllWindowsAzureIps",
+          "type": "firewallrules",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "[variables('sqlApiVersion')]",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', variables('paas-sql-name'))]"
+          ],
+          "properties": {
+            "startIpAddress": "0.0.0.0",
+            "endIpAddress": "0.0.0.0"
+          }
+        }
+       ]
+      }
+    ]
+}

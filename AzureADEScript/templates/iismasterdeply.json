@@ -1,0 +1,110 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "vaultId": {
+        "type": "string"
+      },
+      "sshkey": {
+        "type": "string"
+      },
+      "paas-sql-admin-password": {
+        "type": "string"
+      },
+      "jumpbox-admin-password": {
+        "type": "string"
+      },
+      "iaas-sql-admin-password": {
+        "type": "string"
+      },
+      "iaas-vm-admin-password": {
+        "type": "string"
+      },
+      "aadAppName": {
+        "type": "string"
+      },
+      "aadAppSecret": {
+        "type": "string"
+      }
+    },
+    "resources": [
+    {
+      "apiVersion": "2015-01-01",
+      "name": "nestedTemplate",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "incremental",
+        "templateLink": {
+          "uri": "https://www.contoso.com/AzureTemplates/newVM.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminPassword": {
+            "reference": {
+              "keyVault": {
+                "id": "[parameters('vaultId')]"
+              },
+              "secretName": "[parameters('secretName')]"
+            }
+          },
+          "adminPassword": {
+            "reference": {
+              "keyVault": {
+                "id": "[parameters('vaultId')]"
+              },
+              "secretName": "[parameters('secretName')]"
+            }
+          },
+          "adminPassword": {
+            "reference": {
+              "keyVault": {
+                "id": "[parameters('vaultId')]"
+              },
+              "secretName": "[parameters('secretName')]"
+            }
+          },
+          "adminPassword": {
+            "reference": {
+              "keyVault": {
+                "id": "[parameters('vaultId')]"
+              },
+              "secretName": "[parameters('secretName')]"
+            }
+          },
+          "adminPassword": {
+            "reference": {
+              "keyVault": {
+                "id": "[parameters('vaultId')]"
+              },
+              "secretName": "[parameters('secretName')]"
+            }
+          },
+          "adminPassword": {
+            "reference": {
+              "keyVault": {
+                "id": "[parameters('vaultId')]"
+              },
+              "secretName": "[parameters('secretName')]"
+            }
+          },
+          "adminPassword": {
+            "reference": {
+              "keyVault": {
+                "id": "[parameters('vaultId')]"
+              },
+              "secretName": "[parameters('secretName')]"
+            }
+          },
+          "adminPassword": {
+            "reference": {
+              "keyVault": {
+                "id": "[parameters('vaultId')]"
+              },
+              "secretName": "[parameters('secretName')]"
+            }
+          },
+        }
+      }
+    }],
+    "outputs": {}
+}
