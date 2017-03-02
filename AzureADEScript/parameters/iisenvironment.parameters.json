@@ -51,7 +51,7 @@
             "value": 1579
         },
         "sqlStorageDisksCount": {
-            "value": 2
+            "value": 1
         },
         "sqlStorageWorkloadType": {
             "value": "GENERAL"
