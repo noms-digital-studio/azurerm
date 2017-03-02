@@ -9,7 +9,6 @@
 #     Jump box, 
 #     Storage accounts with encryption, 
 #     SQL PAAS, 
-#     VNET, 
 #     NSG
 #
 ###############################################################################################
@@ -66,12 +65,12 @@ Param(
     }
     $userObjectID = Get-AzureRmaduser | Select-Object -ExpandProperty Id 
     $userObjectID = $userObjectID.Guid
-
+    Write-Host "`t object Id: $userObjectID" -foregroundcolor Green;
 ###############################################################################################
 # Section2:  Create Resource Group. 
 ###############################################################################################
 
-New-AzureRmResourceGroup -Name $resourceGroupName -Location $Location
+New-AzureRmResourceGroup -Name $resourceGroupName -Location $Location 
 
 ###############################################################################################
 # Section3:  Create KeyVault and add secrets. 
@@ -101,7 +100,7 @@ $jumpboxadmin = ConvertTo-SecureString ((Get-AzureKeyVaultSecret -VaultName $key
 $aasClientSecret = ConvertTo-SecureString ((Get-AzureKeyVaultSecret -VaultName $keyVaultName -Name 'aadUserPassword').SecretValue) -AsPlainText -force
 #New-AzureRmResourceGroupDeployment -name iistestdeploy -ResourceGroupName $RGName -TemplateFile .\templates\iisenvironment.json -TemplateParameterFile .\parameters$parameterfileenvironment -aadClientID $aadClientIID -aadClientSecret $aadClientSecret -keyVaultResourceId $keyVaultResourceId
 
-New-AzureRmResourceGroupDeployment -name iistestdeploy -ResourceGroupName $resourceGroupName -TemplateFile .\templates\iisenvironment.json -TemplateParameterFile .\parameters\iisenvironment.parameters.json -adminpassword $adminpassword -jumpboxadminpassword $jumpboxadmin -sqldb-admin-password $sqladminpassword -paas-sqlAuthenticationPassword $passsqlpassword
+New-AzureRmResourceGroupDeployment -name iistestdeploy -ResourceGroupName $resourceGroupName -TemplateFile .\templates\iisenvironment.json -TemplateParameterFile .\parameters\iisenvironment.parameters.json -adminpassword $adminpassword -jumpboxadminpassword $jumpboxadmin -sqldb-admin-password $sqladminpassword -paas-sqlAuthenticationPassword $passsqlpassword -objectId $userObjectID
 
 
 ###############################################################################################

@@ -205,9 +205,35 @@
           ],
           "defaultValue": "GENERAL"
         },
+        "sqlStorageStartingDeviceId": {
+            "type": "int"
+        },
+        "sqlStorageDisksConfigurationType": {
+            "type": "string"
+        },
+        "rServicesEnabled": {
+            "type": "string"
+        },
+        "malware_RealtimeProtectionEnabled": {
+            "type": "string"
+        },
+        "malware_ScheduledScanSettingsIsEnabled": {
+            "type": "string"
+        },
+        "malware_ScheduledScanSettingsScanType": {
+            "type": "string"
+        },
+        "malware_ScheduledScanSettingsDay": {
+            "type": "string"
+        },
+        "malware_ScheduledScanSettingsTime": {
+            "type": "string"
+        },
     },
     "variables": {
-        "diagnostic-storage-account-name": "[concat('joetest', parameters('service-tag'), 'logs', parameters('environment-tag'))]",
+        "vhdStorageAccountName": "[concat(parameters('service-tag'), parameters('environment-tag'),'diskstore')]",
+        "fileStorageAccountName": "[concat(parameters('service-tag'), parameters('environment-tag'),'filestore')]",
+        "diagnostic-storage-account-name": "[concat(parameters('service-tag'), 'logs', parameters('environment-tag'))]",
         "diagnostic-storage-account-id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/',resourceGroup().Name, '/providers/','Microsoft.Storage/storageAccounts/', variables('diagnostic-storage-account-name'))]",
         "vnet-name": "[concat('vnet-iis-', parameters('environment-tag'))]",
         "networkApiVersion": "2015-06-15",
@@ -237,8 +263,8 @@
         "paas-sql-db-requested-service-objective-name": "S0",
         "sqlApiVersion": "2014-04-01-preview",
         "paas-sqldb-default-admin-user": "[concat('sql-paas-iis-', parameters('environment-tag'), '-admin')]",
-
-            
+        "vhdStorageAccountName": "[concat(parameters('service-tag'), parameters('environment-tag'),'diskstore')]",
+        "fileStorageAccountName": "[concat(parameters('service-tag'), parameters('environment-tag'),'filestore')]",  
         "metricsresourceid": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name ,'/providers/','Microsoft.Compute/virtualMachines/',variables('sql-server-name'))]",
         "wadlogs": "<WadCfg> <DiagnosticMonitorConfiguration overallQuotaInMB=\"4096\" xmlns=\"http://schemas.microsoft.com/ServiceHosting/2010/10/DiagnosticsConfiguration\"> <DiagnosticInfrastructureLogs scheduledTransferLogLevelFilter=\"Error\"/> <WindowsEventLog scheduledTransferPeriod=\"PT1M\" > <DataSource name=\"Application!*[System[(Level = 1 or Level = 2)]]\" /> <DataSource name=\"Security!*[System[(Level = 1 or Level = 2)]]\" /> <DataSource name=\"System!*[System[(Level = 1 or Level = 2)]]\" /></WindowsEventLog>",
         "wadperfcounters": "<PerformanceCounters scheduledTransferPeriod=\"PT1M\"><PerformanceCounterConfiguration counterSpecifier=\"\\Processor(_Total)\\% Processor Time\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU utilization\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor(_Total)\\% Privileged Time\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU privileged time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor(_Total)\\% User Time\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU user time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor Information(_Total)\\Processor Frequency\" sampleRate=\"PT15S\" unit=\"Count\"><annotation displayName=\"CPU frequency\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\System\\Processes\" sampleRate=\"PT15S\" unit=\"Count\"><annotation displayName=\"Processes\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Process(_Total)\\Thread Count\" sampleRate=\"PT15S\" unit=\"Count\"><annotation displayName=\"Threads\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Process(_Total)\\Handle Count\" sampleRate=\"PT15S\" unit=\"Count\"><annotation displayName=\"Handles\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\% Committed Bytes In Use\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Memory usage\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\Available Bytes\" sampleRate=\"PT15S\" unit=\"Bytes\"><annotation displayName=\"Memory available\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\Committed Bytes\" sampleRate=\"PT15S\" unit=\"Bytes\"><annotation displayName=\"Memory committed\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\Commit Limit\" sampleRate=\"PT15S\" unit=\"Bytes\"><annotation displayName=\"Memory commit limit\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk(_Total)\\% Disk Time\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Disk active time\" locale=\"en-us\"/></PerformanceCounterConfiguration>",
@@ -248,14 +274,43 @@
     },
     "resources": [
     { 
-      "comments": "Storage account for IIS.",
+      "comments": "Storage account for IIS VHDs.",
       "type": "Microsoft.Storage/storageAccounts",
       "sku": {
-          "name": "Standard_LRS",
+          "name": "Standard_GRS",
+          "tier": "Standard"
+        },
+      "kind": "Storage",
+      "name": "[variables('vhdStorageAccountName')]",
+      "apiVersion": "2016-01-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+          "Environment": "[parameters('environment-tag')]",
+          "Service": "[parameters('service-tag')]",
+          "Role": "Other"
+        },
+      "properties": {
+          "encryption": {
+              "keySource": "Microsoft.Storage",
+              "services": {
+                    "blob": {
+                      "enabled": true
+                      }
+                  }
+              }
+          },
+        "resources": [],
+        "dependsOn": []
+        },
+    { 
+      "comments": "Storage account for file.",
+      "type": "Microsoft.Storage/storageAccounts",
+      "sku": {
+          "name": "Standard_GRS",
           "tier": "Standard"
         },
       "kind": "BlobStorage",
-      "name": "[concat('joetest',parameters('service-tag'), parameters('environment-tag'))]",
+      "name": "[variables('fileStorageAccountName')]",
       "apiVersion": "2016-01-01",
       "location": "[resourceGroup().location]",
       "tags": {
@@ -391,217 +446,190 @@
             ]
           }
         },
+
     {
-      "name": "[variables('sql-server-name')]",
-      "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "2016-04-30-preview",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "Environment": "[parameters('environment-tag')]",
-        "Service": "[parameters('service-tag')]",
-        "Role": "DB"
-        },
-      "dependsOn": [
-        "[concat('Microsoft.Network/networkInterfaces/', variables('sql-server-nic-name'))]"
-      ],
-      "properties": {
-        "osProfile": {
-          "computerName": "[variables('sql-server-name')]",
-          "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]",
-          "windowsConfiguration": {
-            "provisionVmAgent": "true"
-          }
-        },
-        "hardwareProfile": {
-          "vmSize": "[parameters('sql-vm-size')]"
-        },
-        "storageProfile": {
-          "imageReference": {
-            "publisher": "MicrosoftSQLServer",
-            "offer": "SQL2014SP1-WS2012R2",
-            "sku": "Enterprise",
-            "version": "latest"
-          },
-          "osDisk": {
-            "createOption": "FromImage",
-            "managedDisk": {
-              "storageAccountType": "[parameters('vm-storage-account-type')]"
-            }
-          },
-          "dataDisks": [
-            {
-              "createOption": "Empty",
-              "lun": 0,
-              "diskSizeGB": "1023",
-              "caching": "ReadOnly",
-              "managedDisk": {
-                "storageAccountType": "[parameters('vm-storage-account-type')]"
-              }
-            },
-            {
-              "createOption": "Empty",
-              "lun": 1,
-              "diskSizeGB": "1023",
-              "caching": "ReadOnly",
-              "managedDisk": {
-                "storageAccountType": "[parameters('vm-storage-account-type')]"
-              }
-            }
-          ]
-        },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('sql-server-nic-name'))]"
-            }
-          ]
-        }
+     "name": "[variables('sql-server-name')]",
+     "type": "Microsoft.Compute/virtualMachines",
+     "apiVersion": "2016-04-30-preview",
+     "location": "[resourceGroup().location]",
+     "tags": {
+      "Environment": "[parameters('environment-tag')]",
+      "Service": "[parameters('service-tag')]",
+      "Role": "DB"
       },
-        "resources": [
-        {
-            "name": "Microsoft.Insights.VMDiagnosticsSettings",
-            "type": "extensions",
-            "location": "[resourceGroup().location]",
-            "apiVersion": "2015-05-01-preview",
-            "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', variables('sql-server-name'))]",
-                "[concat('Microsoft.Storage/storageAccounts/', variables('diagnostic-storage-account-name'))]"
-            ],
-            "tags": {
-                "displayName": "AzureDiagnostics",
-                "Environment": "[parameters('environment-tag')]",
-                "Service": "[parameters('service-tag')]"
+     "dependsOn": [
+         "[concat('Microsoft.Network/networkInterfaces/', variables('sql-server-nic-name'))]",
+         "[concat('Microsoft.Storage/storageAccounts/', variables('vhdStorageAccountName'))]",
+         "[concat('Microsoft.Storage/storageAccounts/', variables('diagnostic-storage-account-name'))]"
+     ],
+     "properties": {
+         "osProfile": {
+             "computerName": "[variables('sql-server-name')]",
+             "adminUsername": "[parameters('adminUsername')]",
+             "adminPassword": "[parameters('adminPassword')]",
+             "windowsConfiguration": {
+                 "provisionVmAgent": "true"
+             }
+         },
+         "hardwareProfile": {
+             "vmSize": "[parameters('sql-vm-size')]"
+         },
+         "storageProfile": {
+             "imageReference": {
+                 "publisher": "MicrosoftSQLServer",
+                 "offer": "SQL2012SP3-WS2012R2",
+                 "sku": "Standard",
+                 "version": "latest"
+             },
+             "osDisk": {
+                 "name": "[variables('sql-server-name')]",
+                 "createOption": "fromImage",
+                 "vhd": {
+                     "uri": "[concat(concat(reference(resourceId(resourceGroup().Name, 'Microsoft.Storage/storageAccounts', variables('vhdStorageAccountName')), '2015-06-15').primaryEndpoints['blob'], 'vhds/'), variables('sql-server-name'), 'os.vhd')]"
+                 }
+             },
+             "dataDisks": [
+                 {
+                     "name": "[concat(variables('sql-server-name'), '-disk-1')]",
+                     "createOption": "empty",
+                     "lun": 0,
+                     "diskSizeGB": "1023",
+                     "caching": "ReadOnly",
+                     "vhd": {
+                         "uri": "[concat(concat(reference(resourceId(resourceGroup().Name, 'Microsoft.Storage/storageAccounts', variables('vhdStorageAccountName')), '2015-06-15').primaryEndpoints['blob'], 'vhds/'), variables('sql-server-name'), '-disk-1', '.vhd')]"
+                     }
+                 }
+             ]
+         },
+         "networkProfile": {
+             "networkInterfaces": [
+                 {
+                     "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('sql-server-nic-name'))]"
+                 }
+             ]
+         },
+         "diagnosticsProfile": {
+             "bootDiagnostics": {
+                 "enabled": true,
+                 "storageUri": "[reference(resourceId(resourceGroup().Name, 'Microsoft.Storage/storageAccounts', variables('diagnostic-storage-account-name')), '2015-06-15').primaryEndpoints['blob']]"
+             }
+         }
+     }
+    },
+    {
+        "name": "[concat(variables('sql-server-name'),'/Microsoft.Insights.VMDiagnosticsSettings')]",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2016-04-30-preview",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', variables('sql-server-name'))]"
+        ],
+        "properties": {
+            "publisher": "Microsoft.Azure.Diagnostics",
+            "type": "IaaSDiagnostics",
+            "typeHandlerVersion": "1.5",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+                "StorageAccount": "[variables('diagnostic-storage-account-name')]",
+                "xmlCfg": "[base64(variables('wadcfgx'))]"
             },
-            "properties": {
-                "publisher": "Microsoft.Azure.Diagnostics",
-                "type": "IaaSDiagnostics",
-                "typeHandlerVersion": "1.4",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "xmlCfg": "[base64(variables('wadcfgx'))]",
-                    "storageAccount": "[variables('diagnostic-storage-account-name')]"
+            "protectedSettings": {
+                "storageAccountName": "[variables('diagnostic-storage-account-name')]",
+                "storageAccountKey": "[listKeys(variables('diagnostic-storage-account-id'),'2015-06-15').key1]",
+                "storageAccountEndPoint": "https://core.windows.net/"
+            }
+        }
+    },
+    {
+        "name": "microsoft.antimalware-windows",
+        "apiVersion": "2015-01-01",
+        "type": "Microsoft.Resources/deployments",
+        "properties": {
+            "mode": "incremental",
+            "templateLink": {
+                "uri": "https://gallery.azure.com/artifact/20161101/microsoft.antimalware-windows-arm.1.0.0/Artifacts/MainTemplate.json"
+            },
+            "parameters": {
+                "vmName": {
+                    "value": "[variables('sql-server-name')]"
                 },
-                "protectedSettings": {
-                    "storageAccountName": "[variables('diagnostic-storage-account-name')]",
-                    "storageAccountKey": "[listkeys(variables('diagnostic-storage-account-id'), '2015-05-01-preview').key1]",
-                    "storageAccountEndPoint": "https://core.windows.net"
+                "location": {
+                    "value": "[resourceGroup().location]"
+                },
+                "RealtimeProtectionEnabled": {
+                    "value": "[parameters('malware_RealtimeProtectionEnabled')]"
+                },
+                "ScheduledScanSettingsIsEnabled": {
+                    "value": "[parameters('malware_ScheduledScanSettingsIsEnabled')]"
+                },
+                "ScheduledScanSettingsScanType": {
+                    "value": "[parameters('malware_ScheduledScanSettingsScanType')]"
+                },
+                "ScheduledScanSettingsDay": {
+                    "value": "[parameters('malware_ScheduledScanSettingsDay')]"
+                },
+                "ScheduledScanSettingsTime": {
+                    "value": "[parameters('malware_ScheduledScanSettingsTime')]"
                 }
             }
-        }
-      ]
-    },
-    {
-      "apiVersion": "2015-06-15",
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(variables('sql-server-name'), '/SqlIaasExtension')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('sql-server-name'))]"
-      ],
-      "properties": {
-        "type": "SqlIaaSAgent",
-        "publisher": "Microsoft.SqlServer.Management",
-        "typeHandlerVersion": "1.2",
-        "autoUpgradeMinorVersion": true,
-        "settings": {
-          "AutoTelemetrySettings": {
-            "Region": "[resourceGroup().location]"
-          },
-          "AutoPatchingSettings": {
-            "PatchCategory": "WindowsMandatoryUpdates",
-            "Enable": true,
-            "DayOfWeek": "[parameters('sqlAutopatchingDayOfWeek')]",
-            "MaintenanceWindowStartingHour": "[parameters('sqlAutopatchingStartHour')]",
-            "MaintenanceWindowDuration": "[parameters('sqlAutopatchingWindowDuration')]"
-          }
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(variables('sql-server-name'), '/malware')]",
-      "apiVersion": "2015-06-15",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('sql-server-name'))]"
-      ],
-      "properties": {
-        "publisher": "Microsoft.Azure.Security",
-        "type": "IaaSAntimalware",
-        "typeHandlerVersion": "1.1",
-        "settings": {
-          "AntimalwareEnabled": "true",
-          "Exclusions": {
-            "Paths": "C:\\Users",
-            "Extensions": ".txt",
-            "Processes": "taskmgr.exe"
-          },
-          "RealtimeProtectionEnabled": "true",
-          "ScheduledScanSettings": {
-            "isEnabled": "true",
-            "scanType": "Quick",
-            "day": "7",
-            "time": "120"
-          }
         },
-        "protectedSettings": null
-      }
+        "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/',variables('sql-server-name'),'/extensions/Microsoft.Insights.VMDiagnosticsSettings')]"
+        ]
     },
     {
-      "type": "Microsoft.Resources/deployments",
-      "name": "prepareSqlVmDeployment",
-      "apiVersion": "2016-02-01",
-      "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('sql-server-name'), '/extensions/SqlIaasExtension')]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-vm-sql-full-autopatching/nested/preparingSqlServerSa.json"
-        },
-        "parameters": {
-          "location": {
-            "value": "[resourceGroup().location]"
-          },
-          "sqlVMName": {
-            "value": "[variables('sql-server-name')]"
-          },
-          "adminUsername": {
-            "value": "[parameters('adminUsername')]"
-          },
-          "adminPassword": {
-            "value": "[parameters('adminPassword')]"
-          },
-          "sqlUsername": {
-            "value": "[variables('sqldb-default-admin-user')]"
-          },
-          "sqlPassword": {
-            "value": "[parameters('sqldb-admin-password')]"
-          },
-          "disksCount": {
-            "value": "[parameters('sqlStorageDisksCount')]"
-          },
-          "diskSizeInGB": {
-            "value": 1023
-          },
-          "sqlEnginePort": {
-            "value": "[parameters('sqlPortNumber')]"
-          },
-          "workloadType": {
-            "value": "[parameters('sqlStorageWorkloadType')]"
-          },
-          "connectionType": {
-            "value": "[parameters('sqlConnectivityType')]"
-          },
-          "sqlVMPrepareModulesURL": {
-            "value": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-vm-sql-full-autopatching/scripts/PrepareSqlServer.ps1.zip"
-          },
-          "sqlVMPrepareConfigurationFunction": {
-            "value": "PrepareSqlServerSa.ps1\\PrepareSqlServerSa"
-          }
+        "apiVersion": "2015-06-15",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "name": "[concat(variables('sql-server-name'), '/SqlIaasExtension')]",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', variables('sql-server-name'))]",
+            "microsoft.antimalware-windows"
+        ],
+        "properties": {
+            "type": "SqlIaaSAgent",
+            "publisher": "Microsoft.SqlServer.Management",
+            "typeHandlerVersion": "1.2",
+            "autoUpgradeMinorVersion": "true",
+            "settings": {
+                "AutoTelemetrySettings": {
+                    "Region": "[resourceGroup().location]"
+                },
+                "AutoPatchingSettings": {
+                    "PatchCategory": "WindowsMandatoryUpdates",
+                    "Enable": true,
+                    "DayOfWeek": "[parameters('sqlAutopatchingDayOfWeek')]",
+                    "MaintenanceWindowStartingHour": "[parameters('sqlAutopatchingStartHour')]",
+                    "MaintenanceWindowDuration": "[parameters('sqlAutopatchingWindowDuration')]"
+                },
+                "KeyVaultCredentialSettings": {
+                    "Enable": false,
+                    "CredentialName": ""
+                },
+                "ServerConfigurationsManagementSettings": {
+                    "SQLConnectivityUpdateSettings": {
+                        "ConnectivityType": "[parameters('sqlConnectivityType')]",
+                        "Port": "[parameters('sqlPortNumber')]"
+                    },
+                    "SQLWorkloadTypeUpdateSettings": {
+                        "SQLWorkloadType": "[parameters('sqlStorageWorkloadType')]"
+                    },
+                    "SQLStorageUpdateSettings": {
+                        "DiskCount": "[parameters('sqlStorageDisksCount')]",
+                        "NumberOfColumns": "[parameters('sqlStorageDisksCount')]",
+                        "StartingDeviceID": "[parameters('sqlStorageStartingDeviceId')]",
+                        "DiskConfigurationType": "[parameters('sqlStorageDisksConfigurationType')]"
+                    },
+                    "AdditionalFeaturesServerConfigurations": {
+                        "IsRServicesEnabled": "[parameters('rServicesEnabled')]"
+                    }
+                }
+            },
+            "protectedSettings": {
+              "SQLAuthUpdateUserName": "[variables('sqldb-default-admin-user')]",
+              "SQLAuthUpdatePassword": "[parameters('sqldb-admin-password')]"
+            }
         }
-      }
     },
     {
       "type": "Microsoft.Compute/virtualMachines",

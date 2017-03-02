@@ -8,14 +8,11 @@
         "service-tag": {
             "value": "iis"
         },
-        "objectId": {
-          "value": "0a2d0466-eae2-4b57-a5c4-811d506142a6"
-        },
         "adminUsername": {
             "value": "iisadmin"
         },
         "digital-Studio-public-IP": {
-            "value": "195.89.171.5"
+            "value": "217.33.148.210"
         },
         "jumpboxAdminUsername": {
             "value": "linuxadmin"
@@ -59,6 +56,12 @@
         "sqlStorageWorkloadType": {
             "value": "GENERAL"
         },
+        "sqlStorageDisksConfigurationType": {
+            "value": "NEW"
+        },
+        "sqlStorageStartingDeviceId": {
+            "value": 2
+        },
         "sqlAutopatchingDayOfWeek": {
             "value": "Sunday"
         },
@@ -70,6 +73,27 @@
         },
         "adminsshpublickey": {
           "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDN30bXPerJCMi7Mex6KR4YwSSPavbPNL/T2sxr4wX2YzLuYH07jx0R25Z2x3kGGZvbKRaz3UzbEmFF7e8yWItUxLzX/nGmKz+e+JAZ70f7nOD+SnsXycZvRRHK/1fW32FcuAUJZjrmeDP4TL57ZsbiBeNzYqlEVKWCYRoXVflovuFI6qRVtKXpJr3KTVy/mmH7YsgF8hut/g6RG1kP4dUcKSoeNTHvMFPcfglpIZ8/+JICSoPyi7sgkJlrDxKUwKqh9xv5dQ/LGcrk+FAGP3PLJAeJ+0OGOyayTcAJEAcJbT4Y45Yslhhro7xGh9vLGg1EaqeHN4GzrJMKCtWg75rb joemc@fisherkingblues.kainos.com"
+        },
+        "malware_RealtimeProtectionEnabled": {
+            "type": "string"
+        },
+        "malware_RealtimeProtectionEnabled": {
+            "value": "true"
+        },
+        "malware_ScheduledScanSettingsIsEnabled": {
+            "value": "false"
+        },
+        "malware_ScheduledScanSettingsScanType": {
+            "value": "Quick"
+        },
+        "malware_ScheduledScanSettingsDay": {
+            "value": "7"
+        },
+        "malware_ScheduledScanSettingsTime": {
+            "value": "120"
+        },
+        "rServicesEnabled": {
+            "value": "false"
         }
     }
 }
