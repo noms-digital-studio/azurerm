@@ -10,6 +10,8 @@
 #     Storage accounts with encryption, 
 #     SQL PAAS, 
 #     NSG
+# 5) Enable Jump Box logging (this has to be done by Powershell/CLI as its not supported using json for configuration of this
+# 6) Encrypt SQL VM disks
 #
 ###############################################################################################
 
@@ -52,7 +54,7 @@ Param(
 )
 
 ###############################################################################################
-# Section1:  Log-in to Azure and select appropriate subscription. 
+# Log-in to Azure and select appropriate subscription. 
 ###############################################################################################
   
 
@@ -67,20 +69,20 @@ Param(
     $userObjectID = $userObjectID.Guid
     Write-Host "`t object Id: $userObjectID" -foregroundcolor Green;
 ###############################################################################################
-# Section2:  Create Resource Group. 
+# Section1:  Create Resource Group. 
 ###############################################################################################
 
 New-AzureRmResourceGroup -Name $resourceGroupName -Location $Location 
 
 ###############################################################################################
-# Section3:  Create KeyVault and add secrets. 
+# Section2:  Create KeyVault and add secrets. 
 ###############################################################################################
 
 New-AzureRmResourceGroupDeployment -name iisvaultdeploy -ResourceGroupName $resourceGroupName -TemplateFile .\templates\iisvault.json -TemplateParameterFile .\parameters\iisvault.parameters.json -keyVaultName $keyVaultName -objectId $userObjectID -aadUserPassword $aadClientSecret
 
 
 ###############################################################################################
-# Section4:  Create AAD Application user and add to keyvault in preparation for disk encryption. 
+# Section3:  Create AAD Application user and add to keyvault in preparation for disk encryption. 
 ###############################################################################################
 
 . .\AzureDiskEncryptionPreRequisiteSetup.ps1 -resourceGroupName $resourceGroupName -location $Location -keyVaultName $keyVaultName -aadAppName $aadAppName -aadClientSecret $aadClientSecret
@@ -101,6 +103,12 @@ $aasClientSecret = ConvertTo-SecureString ((Get-AzureKeyVaultSecret -VaultName $
 #New-AzureRmResourceGroupDeployment -name iistestdeploy -ResourceGroupName $RGName -TemplateFile .\templates\iisenvironment.json -TemplateParameterFile .\parameters$parameterfileenvironment -aadClientID $aadClientIID -aadClientSecret $aadClientSecret -keyVaultResourceId $keyVaultResourceId
 
 New-AzureRmResourceGroupDeployment -name iistestdeploy -ResourceGroupName $resourceGroupName -TemplateFile .\templates\iisenvironment.json -TemplateParameterFile .\parameters\iisenvironment.parameters.json -adminpassword $adminpassword -jumpboxadminpassword $jumpboxadmin -sqldb-admin-password $sqladminpassword -paas-sqlAuthenticationPassword $passsqlpassword -objectId $userObjectID
+
+
+###############################################################################################
+# Section5: Enable Jump Box Diagnostic logging 
+###############################################################################################
+
 
 
 ###############################################################################################

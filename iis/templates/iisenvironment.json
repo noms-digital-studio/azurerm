@@ -235,7 +235,7 @@
       },
       "enableVaultForDeployment": {
         "type": "bool",
-        "defaultValue": false,
+        "defaultValue": true,
         "allowedValues": [
           true,
           false
@@ -246,7 +246,7 @@
       },
       "enableVaultForDiskEncryption": {
         "type": "bool",
-        "defaultValue": false,
+        "defaultValue": true,
         "allowedValues": [
           true,
           false
@@ -257,7 +257,7 @@
       },
       "enabledForTemplateDeployment": {
         "type": "bool",
-        "defaultValue": false,
+        "defaultValue": true,
         "allowedValues": [
           true,
           false

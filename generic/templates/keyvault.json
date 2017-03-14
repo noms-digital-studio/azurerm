@@ -101,7 +101,20 @@
           "name": "[parameters('skuName')]",
           "family": "A"
         }
+      },
+      "resources": [
+      {
+        "type": "secrets",
+        "name": "",
+        "apiVersion": "2015-06-01",
+        "properties":{
+          "value": ""
+        },
+        "dependsOn": [
+          "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
+        ]
       }
+      ]
     },
     {
       "type": "Microsoft.KeyVault/vaults/secrets",
