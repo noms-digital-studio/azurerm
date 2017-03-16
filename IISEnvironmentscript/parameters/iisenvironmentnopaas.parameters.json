@@ -1,0 +1,99 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environment-tag": {
+            "value": "production"
+        },
+        "service-tag": {
+            "value": "iis"
+        },
+        "adminUsername": {
+            "value": "iisadmin"
+        },
+        "digital-Studio-public-IP": {
+            "value": "217.33.148.210"
+        },
+        "jumpboxAdminUsername": {
+            "value": "linuxadmin"
+        },
+        "sshUserName": {
+            "value": "iisaccess"
+        },
+        "sql-vm-size": {  
+            "value": "Standard_DS4_v2"
+        },
+        "vm-storage-account-type": {
+            "value": "Standard_LRS"
+        },
+        "sqlAutopatchingDayOfWeek": {
+            "value": "Sunday"
+        },
+        "sqlAutopatchingStartHour": {
+            "value": "2"
+        },
+        "sqlAutopatchingWindowDuration": {
+            "value": "60"
+        },
+        "paas-sqlAuthenticationLogin": {
+            "value": "iis-paas-sql-admin"
+        },
+        "vnetPrefix": {
+            "value": "10.0.0.0/24"
+        },
+        "sqlsubnetPrefix": {
+            "value": "10.0.0.0/24"
+        },
+        "sqlConnectivityType": {
+            "value": "Public"
+        },
+        "sqlPortNumber": {
+            "value": 1579
+        },
+        "sqlStorageDisksCount": {
+            "value": 1
+        },
+        "sqlStorageWorkloadType": {
+            "value": "GENERAL"
+        },
+        "sqlStorageDisksConfigurationType": {
+            "value": "NEW"
+        },
+        "sqlStorageStartingDeviceId": {
+            "value": 2
+        },
+        "sqlAutopatchingDayOfWeek": {
+            "value": "Sunday"
+        },
+        "sqlAutopatchingStartHour": {
+            "value": "2"
+        },
+        "sqlAutopatchingWindowDuration": {
+            "value": "60"
+        },
+        "adminsshpublickey": {
+          "value": "AAAAB3NzaC1yc2EAAAADAQABAAABAQCcplVeB7o8grv6B9vapdAeJMRU/MEV8nltlhnT5KzDoAzVMsHU5qE9jySh1HeqL5mXr71BwrJbhx6+Yf1CR7uTA4UV0I3R4Z0wLi4BAgthCQePD6x3goXKw2rEsoa/39T24fNJUhCA123iuHj8qh2X7j1XMtra/X8wCTItB66LgilF4gVkO9B0QbCOxj10Mjb6rcKw3Uah4zPvsP//lYG95fU7UEj85B+iRjG/kVg3P+hphajcrEJ71Muve62ChRekyuWaRW9DhvrxMaCWyUjTHxQWfV2ptiG3jqtMQlEGoc+evC/naN664T1Ks+jAZ/s1JWb9mhqkF85BwrsW3xpt joemc@fisherkingblues.kainos.com"
+        },
+        "malware_RealtimeProtectionEnabled": {
+            "type": "string"
+        },
+        "malware_RealtimeProtectionEnabled": {
+            "value": "true"
+        },
+        "malware_ScheduledScanSettingsIsEnabled": {
+            "value": "false"
+        },
+        "malware_ScheduledScanSettingsScanType": {
+            "value": "Quick"
+        },
+        "malware_ScheduledScanSettingsDay": {
+            "value": "7"
+        },
+        "malware_ScheduledScanSettingsTime": {
+            "value": "120"
+        },
+        "rServicesEnabled": {
+            "value": "false"
+        }
+    }
+}

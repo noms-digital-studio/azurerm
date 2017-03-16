@@ -41,7 +41,7 @@ Param(
   [ValidateNotNullOrEmpty()]
   [secureString]$aadClientSecret,
 
-  [Parameter(Mandatory = $false,
+  [Parameter(Mandatory = $true,
              HelpMessage="Identifier of the Azure subscription to be used. Default subscription will be used if not specified.")]
   [ValidateNotNullOrEmpty()]
   [string]$subscriptionId,
@@ -75,7 +75,7 @@ Param(
 # Section1:  Create Resource Group. 
 ###############################################################################################
 
-New-AzureRmResourceGroup -Name $resourceGroupName -Location $Location 
+#New-AzureRmResourceGroup -Name $resourceGroupName -Location $Location 
 
 ###############################################################################################
 # Section2:  Create KeyVault and add secrets. 
@@ -105,7 +105,7 @@ $jumpboxadmin = ConvertTo-SecureString ((Get-AzureKeyVaultSecret -VaultName $key
 $aasClientSecret = ConvertTo-SecureString ((Get-AzureKeyVaultSecret -VaultName $keyVaultName -Name 'aadUserPassword').SecretValue) -AsPlainText -force
 #New-AzureRmResourceGroupDeployment -name iistestdeploy -ResourceGroupName $RGName -TemplateFile .\templates\iisenvironment.json -TemplateParameterFile .\parameters$parameterfileenvironment -aadClientID $aadClientIID -aadClientSecret $aadClientSecret -keyVaultResourceId $keyVaultResourceId
 
-New-AzureRmResourceGroupDeployment -name iistestdeploy -ResourceGroupName $resourceGroupName -TemplateFile .\templates\iisenvironment.json -TemplateParameterFile .\parameters\iisenvironment.parameters.json -adminpassword $adminpassword -jumpboxadminpassword $jumpboxadmin -sqldb-admin-password $sqladminpassword -paas-sqlAuthenticationPassword $passsqlpassword -objectId $userObjectID
+New-AzureRmResourceGroupDeployment -name iistestdeploy -ResourceGroupName $resourceGroupName -TemplateFile .\templates\iisenvironmentnopaas.json -TemplateParameterFile .\parameters\iisenvironment.parameters.json -adminpassword $adminpassword -jumpboxadminpassword $jumpboxadmin -sqldb-admin-password $sqladminpassword -paas-sqlAuthenticationPassword $passsqlpassword -objectId $userObjectID
 
 
 ###############################################################################################
