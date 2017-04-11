@@ -1,0 +1,53 @@
+{
+  "agentpublicCount": {
+    "value": 3
+  },
+  "environment-tag": {
+    "value": "dev"
+  },
+  "agentpublicEndpointDNSNamePrefix": {
+    "value": "dev"
+  },
+  "agentpublicSubnet": {
+    "value": "10.0.0.0/24"
+  },
+  "agentpublicVMSize": {
+    "value": "Standard_D2_v2"
+  },
+  "firstConsecutiveStaticIP": {
+    "value": "172.16.0.5"
+  },
+  "linuxAdminUsername": {
+    "value": "master"
+  },
+  "location": {
+    "value": "ukwest"
+  },
+  "masterEndpointDNSNamePrefix": {
+    "value": "dev-master"
+  },
+  "masterSubnet": {
+    "value": "172.16.0.0/24"
+  },
+  "masterVMSize": {
+    "value": "Standard_D2_v2"
+  },
+  "sshRSAPublicKey": {
+    "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC2S9u3wM70ZQ3hVUEblnVMbOSUIp3Z2ju57CGE71MZOvPrp9FwNZjVeRiwzBmnu4lIV7vtBnDnBcPb92qxvYm9Rp2BE+N5u9mB2VX6/W8GeiqfmNiv1Mp7+Tj6+R99OpwbDx//l8sK/G7sWIEq8kB8TBXJoOw5BWO9M2jPA7NN9dFlIWtNuQjBB5vwMM5Cr6+GKhvCi9pLLh8mcq6BsViJUP7lLbPvYrEmlX4e+HQK48Gnu9pV9AMY380XazojuW7bge8sQCK9Cd3ja8VIbaS8da5BQ+97wmFTWKkIJy8yVGmtUq1CvETAh1JasucLG9AqjTNa7MD1u8D72S3LcH9n joemc@fisherkingblues.kainos.com"
+  },
+  "targetEnvironment": {
+    "value": "AzurePublicCloud"
+  },
+  "applicationGatewaySize": {
+    "value": "WAF_Medium"
+  },
+  "applicationGatewayInstanceCount": {
+    "value": "1"
+  },
+  "frontEndPort": {
+    "value": "443"
+  },
+  "backEndPort": {
+    "value": "3000"
+  }
+}
