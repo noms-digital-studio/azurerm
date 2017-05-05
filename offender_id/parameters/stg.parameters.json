@@ -8,6 +8,9 @@
   "agentpublicEndpointDNSNamePrefix": {
     "value": "stage"
   },
+  "appGWSubnet": {
+    "value": "10.1.1.0/24"
+  },
   "agentpublicSubnet": {
     "value": "10.0.1.0/24"
   },
@@ -41,13 +44,55 @@
   "applicationGatewaySize": {
     "value": "WAF_Medium"
   },
+  "applicationGatewayCapacity": {
+    "value": 1
+  },
   "applicationGatewayInstanceCount": {
-    "value": "1"
+    "value": 1
   },
   "frontEndPort": {
-    "value": "443"
+    "value": 443
   },
   "backEndPort": {
-    "value": "3000"
+    "value": 3000
+  },
+  "sslCertificate": {
+    "value": "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"
+  },
+  "sslCertificatePassword": {
+    "value": ""
+  },
+  "appGWExtHostname": {
+    "value": "offenders-api-stage.hmpps.dsd.io"
+  },
+  "diagnosticStorageSubscriptionID": {
+    "value": "c27cfedb-f5e9-45e6-9642-0fad1a5c94e7"
+  },
+  "diagnosticStorageAccountName": {
+    "value": "offendersapidevlogs"
+  },
+  "administratorLoginPassword": {
+    "value": ""
+  },
+  "logAnalyticsSubscriptionID": {
+    "value": "c27cfedb-f5e9-45e6-9642-0fad1a5c94e7"
+  },
+  "omsWorkspaceName": {
+    "value": "overwatch"
+  },
+  "omsWorkspaceID": {
+    "value": "be54afa6-5664-4b25-927f-0b11ef8e2926"
+  },
+  "omsWorkspaceKey": {
+    "value": "UAIn4+BTq2kbdUIagwU6+uXUcrtxZLXPEwtu1Pt6gw+XPOiPla5JgiAIqt78gklPV3yNfDmMJjUpMDDKQrbAfQ=="
+  },
+  "diagnosticResourceGroup": {
+    "value": "webops"
+  },
+  "resourceGroup": {
+    "value": "offenders-api-stage"
+  },
+  "networkSecurityGroups_sshaccessrestrict_name": {
+    "value": "restrictssh"
   }
 }

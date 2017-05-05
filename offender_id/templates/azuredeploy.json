@@ -111,12 +111,22 @@
       },
       "type": "int"
     },
+    "resourceGroup": {
+      "type": "string"
+    },
     "environment-tag": {
       "type": "String"
     },
     "service-tag": {
       "type": "string",
       "defaultValue": "Offender ID"
+    },
+    "appGWSubnet": {
+      "defaultValue": "10.1.0.0/24",
+      "metadata": {
+        "description": "Sets the subnet of agent pool 'agentpublic'."
+      },
+      "type": "string"
     },
     "agentpublicEndpointDNSNamePrefix": {
       "metadata": {
@@ -188,6 +198,15 @@
       },
       "type": "string"
     },
+    "sslCertificate": {
+      "type": "string"
+    },
+    "sslCertificatePassword": {
+      "type": "string"
+    },
+    "appGWExtHostname": {
+      "type": "string"
+    },
     "targetEnvironment": {
       "defaultValue": "AzureCloud",
       "metadata": {
@@ -199,6 +218,9 @@
       "type": "string"
     },
     "applicationGatewayInstanceCount": {
+      "type": "int"
+    },
+    "applicationGatewayCapacity": {
       "type": "int"
     },
     "frontEndPort": {
@@ -245,8 +267,38 @@
       "metadata": {
         "description": "WAF Rule Set Version"
       }
+    },
+    "omsWorkspaceID": {
+      "type": "string"
+    },
+    "resourceGroup": {
+      "type": "string"
+    },
+    "omsWorkspaceName": {
+      "type": "string"
+    },
+    "diagnosticStorageSubscriptionID": {
+      "type": "string"
+    },
+    "diagnosticStorageAccountName": {
+      "type": "string"
+    },
+    "logAnalyticsSubscriptionID": {
+      "type": "string"
+    },
+    "omsWorkspaceKey": {
+      "type": "string"
+    },
+    "diagnosticResourceGroup": {
+      "type": "string"
+    },
+    "administratorLoginPassword": {
+      "type": "securestring"
+    },
+    "networkSecurityGroups_sshaccessrestrict_name": {
+      "type": "string"
     }
-  },
+  }, 
   "variables": {
     "adminUsername": "[parameters('linuxAdminUsername')]",
     "agentCustomScript": "[concat('/usr/bin/nohup /bin/bash -c \"/bin/bash /opt/azure/containers/',variables('configureClusterScriptFile'), ' ',variables('clusterInstallParameters'),' >> /var/log/azure/cluster-bootstrap.log 2>&1 &\" &')]",
@@ -258,17 +310,19 @@
     "agentpublicEndpointDNSNamePrefix": "[tolower(parameters('agentpublicEndpointDNSNamePrefix'))]",
     "agentpublicIPAddressName": "[concat(variables('orchestratorName'), '-agent-ip-', variables('agentpublicEndpointDNSNamePrefix'), '-', variables('nameSuffix'))]",
     "agentpublicIndex": 0,
-    "agentpublicLbBackendPoolName": "[concat(variables('orchestratorName'), '-agentpublic-', variables('nameSuffix'))]",
-    "agentpublicLbID": "[resourceId('Microsoft.Network/loadBalancers',variables('agentpublicLbName'))]",
-    "agentpublicLbIPConfigID": "[concat(variables('agentpublicLbID'),'/frontendIPConfigurations/', variables('agentpublicLbIPConfigName'))]",
-    "agentpublicLbIPConfigName": "[concat(variables('orchestratorName'), '-agentpublic-', variables('nameSuffix'))]",
-    "agentpublicLbName": "[concat(variables('orchestratorName'), '-agentpublic-', variables('nameSuffix'))]",
-
+    "agentpublicAppGWID": "[resourceId('Microsoft.Network/applicationGateways', variables('agentpublicAppGWName'))]",
     "agentpublicAppGWName": "[concat(variables('orchestratorName'), '-agentpublic-', variables('nameSuffix'))]",
-    "agentpublicAppGWBackendPoolName": "[concat(variables('orchestratorName'), '-agentpublic-', variables('nameSuffix'))]",
-    "agentpublicAppGWID": "[resourceId('Microsoft.Network/applicationGateways',variables('agentpublicAppGWName'))]",
+    "agentpublicAppGWBackendPoolName": "agentBackendPool",
     "agentpublicAppGWIPConfigID": "[concat(variables('agentpublicAppGWID'),'/frontendIPConfigurations/', variables('agentpublicAppGWIPConfigName'))]",
-    "agentpublicAppGWIPConfigName": "[concat(variables('orchestratorName'), '-agentpublic-', variables('nameSuffix'))]",
+    "agentpublicAppGWIPConfigName": "[concat(variables('orchestratorName'), '-agentpublic-', variables('nameSuffix'), '-ip-config')]",
+    "agentpublicSubnetName": "[concat(variables('orchestratorName'), '-appGWsubnet')]",
+    "appGWSubnetID": "[concat(variables('vnetID'),'/subnets/',variables('appGWSubnetName'))]",
+    "appGWSubnet": "[parameters('appGWSubnet')]",
+    "appGWSubnetName": "[concat(variables('orchestratorName'), '-appGWsubnet')]",
+    "healthcheckinterval": "60",
+    "healthchecktimeout": "10",
+    "healthcheckthreshold": "3",
+    "appGWapiversion": "2017-03-01",
 
     "agentpublicStorageAccountOffset": "[mul(variables('maxStorageAccountsPerAgent'),0)]",
     "agentpublicStorageAccountsCount": "[variables('maxStorageAccountsPerAgent')]",
@@ -278,15 +332,18 @@
     "agentpublicVMSize": "[parameters('agentpublicVMSize')]",
     "agentpublicVnetSubnetID": "[concat(variables('vnetID'),'/subnets/',variables('agentpublicSubnetName'))]",
     "apiVersionDefault": "2016-03-30",
-    "apiVersionStorage": "2015-06-15",
+    "apiVersionStorage": "2016-01-01",
     "clusterInstallParameters": "[concat(variables('masterCount'), ' ',variables('masterVMNamePrefix'), ' ',variables('masterFirstAddrOctet4'), ' ',variables('adminUsername'),' ',variables('postInstallScriptURI'),' ',variables('masterFirstAddrPrefix'))]",
     "configureClusterScriptFile": "configure-swarm-cluster.sh",
     "dataStorageAccountPrefixSeed": 97,
-    "db-name": "[concat(parameters('environment'),'-offenderapidb')]",
-    "db-server": "[concat(parameters('environment'),'-offenderapidbsvr')]",
+    "diagnosticStorageSubscriptionID":"[concat('/subscriptions/', parameters('diagnosticStorageSubscriptionID'), '/resourceGroups/', parameters('diagnosticResourceGroup'), '/providers/Microsoft.Storage/storageAccounts/')]",
+    "logAnalyticsSubscriptionID":"[concat('/subscriptions/', parameters('logAnalyticsSubscriptionID'), '/resourceGroups/', parameters('diagnosticResourceGroup'), '/providers/Microsoft.Storage/storageAccounts/')]",    
+    "db-name": "[concat(parameters('environment-tag'),'-offenderapidb-production')]",
+    "db-server": "[concat(parameters('environment-tag'),'-offenderapidbsvr')]",
     "sql-db-default-requested-service-objective-name": "S0",
     "sql-db-default-edition":"Standard",
     "sql-db-default-collation": "SQL_Latin1_General_CP1_CI_AS",
+    "sqlApiVersion": "2014-04-01-preview",
     "location": "[variables('locations')[mod(add(2,length(parameters('location'))),add(1,length(parameters('location'))))]]",
     "locations": [
       "[resourceGroup().location]",
@@ -354,6 +411,7 @@
     "osImageSKU": "14.04.4-LTS",
     "osImageVersion": "latest",
     "postInstallScriptURI": "disabled",
+    "sql-db-default-admin-user": "adminuser",
     "sshKeyPath": "[concat('/home/', variables('adminUsername'), '/.ssh/authorized_keys')]",
     "sshRSAPublicKey": "[parameters('sshRSAPublicKey')]",
     "storageAccountBaseName": "[uniqueString(concat(variables('masterEndpointDNSNamePrefix'),variables('location')))]",
@@ -665,10 +723,22 @@
         "Role": "Other"
       },
       "name": "[concat(variables('storageAccountPrefixes')[mod(add(copyIndex(),variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(copyIndex(),variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentpublicAccountName'))]",
-      "properties": {
-        "accountType": "[variables('vmSizesMap')[variables('agentpublicVMSize')].storageAccountType]"
+      "kind": "Storage", 
+      "sku": {
+        "name": "[variables('vmSizesMap')[variables('agentpublicVMSize')].storageAccountType]",
+        "tier": "Standard"
       },
-      "type": "Microsoft.Storage/storageAccounts"
+      "properties": {
+        "encryption": {
+          "keySource": "Microsoft.Storage",
+          "services": {
+            "blob": {
+              "enabled": "true"
+            }
+          }
+        }
+      },
+      "type": "Microsoft.Storage/storageAccounts",
     },
     {
       "apiVersion": "[variables('apiVersionDefault')]",
@@ -680,172 +750,20 @@
       },
       "name": "[variables('agentpublicIPAddressName')]",
       "properties": {
-        "dnsSettings": {
-          "domainNameLabel": "[variables('agentpublicEndpointDNSNamePrefix')]"
-        },
         "publicIPAllocationMethod": "Dynamic"
       },
       "type": "Microsoft.Network/publicIPAddresses"
-    },
+    }, 
     {
-      "apiVersion": "[variables('apiVersionDefault')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', variables('agentpublicIPAddressName'))]"
-      ],
-      "location": "[variables('location')]",
+      "apiVersion": "[variables('appGWapiversion')]",
+      "name": "[variables('agentpublicAppGWName')]",
+      "type": "Microsoft.Network/applicationGateways",
+      "location": "[resourceGroup().location]",
       "tags": {
         "Environment": "[parameters('environment-tag')]",
         "Service": "[parameters('service-tag')]",
         "Role": "Other"
       },
-      "name": "[variables('agentpublicLbName')]",
-      "properties": {
-        "backendAddressPools": [
-          {
-            "name": "[variables('agentpublicLbBackendPoolName')]"
-          }
-        ],
-        "frontendIPConfigurations": [
-          {
-            "name": "[variables('agentpublicLbIPConfigName')]",
-            "properties": {
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('agentpublicIPAddressName'))]"
-              }
-            }
-          }
-        ],
-        "inboundNatRules": [],
-        "loadBalancingRules": [
-          {
-            "name": "LBRule80",
-            "properties": {
-              "backendAddressPool": {
-                "id": "[concat(variables('agentpublicLbID'), '/backendAddressPools/', variables('agentpublicLbBackendPoolName'))]"
-              },
-              "backendPort": 80,
-              "enableFloatingIP": false,
-              "frontendIPConfiguration": {
-                "id": "[variables('agentpublicLbIPConfigID')]"
-              },
-              "frontendPort": 80,
-              "idleTimeoutInMinutes": 5,
-              "loadDistribution": "Default",
-              "probe": {
-                "id": "[concat(variables('agentpublicLbID'),'/probes/tcp80Probe')]"
-              },
-              "protocol": "tcp"
-            }
-          },
-          {
-            "name": "LBRule443",
-            "properties": {
-              "backendAddressPool": {
-                "id": "[concat(variables('agentpublicLbID'), '/backendAddressPools/', variables('agentpublicLbBackendPoolName'))]"
-              },
-              "backendPort": 443,
-              "enableFloatingIP": false,
-              "frontendIPConfiguration": {
-                "id": "[variables('agentpublicLbIPConfigID')]"
-              },
-              "frontendPort": 443,
-              "idleTimeoutInMinutes": 5,
-              "loadDistribution": "Default",
-              "probe": {
-                "id": "[concat(variables('agentpublicLbID'),'/probes/tcp443Probe')]"
-              },
-              "protocol": "tcp"
-            }
-          },
-          {
-            "name": "LBRule8080",
-            "properties": {
-              "backendAddressPool": {
-                "id": "[concat(variables('agentpublicLbID'), '/backendAddressPools/', variables('agentpublicLbBackendPoolName'))]"
-              },
-              "backendPort": 8080,
-              "enableFloatingIP": false,
-              "frontendIPConfiguration": {
-                "id": "[variables('agentpublicLbIPConfigID')]"
-              },
-              "frontendPort": 8080,
-              "idleTimeoutInMinutes": 5,
-              "loadDistribution": "Default",
-              "probe": {
-                "id": "[concat(variables('agentpublicLbID'),'/probes/tcp8080Probe')]"
-              },
-              "protocol": "tcp"
-            }
-          },
-          {
-            "name": "LBRule3000",
-            "properties": {
-              "backendAddressPool": {
-                "id": "[concat(variables('agentpublicLbID'), '/backendAddressPools/', variables('agentpublicLbBackendPoolName'))]"
-              },
-              "backendPort": 3000,
-              "enableFloatingIP": false,
-              "frontendIPConfiguration": {
-                "id": "[variables('agentpublicLbIPConfigID')]"
-              },
-              "frontendPort": 3000,
-              "idleTimeoutInMinutes": 5,
-              "loadDistribution": "Default",
-              "probe": {
-                "id": "[concat(variables('agentpublicLbID'),'/probes/tcp3000Probe')]"
-              },
-              "protocol": "tcp"
-            }
-          }
-        ],
-        "probes": [
-          {
-            "name": "tcp80Probe",
-            "properties": {
-              "intervalInSeconds": "5",
-              "numberOfProbes": "2",
-              "port": 80,
-              "protocol": "tcp"
-            }
-          },
-          {
-            "name": "tcp443Probe",
-            "properties": {
-              "intervalInSeconds": "5",
-              "numberOfProbes": "2",
-              "port": 443,
-              "protocol": "tcp"
-            }
-          },
-          {
-            "name": "tcp8080Probe",
-            "properties": {
-              "intervalInSeconds": "5",
-              "numberOfProbes": "2",
-              "port": 8080,
-              "protocol": "tcp"
-            }
-          },
-          {
-            "name": "tcp3000Probe",
-            "properties": {
-              "intervalInSeconds": "5",
-              "numberOfProbes": "2",
-              "port": 3000,
-              "protocol": "tcp"
-            }
-          }
-        ]
-      },
-      "type": "Microsoft.Network/loadBalancers"
-    },
-    ********APPLICATION GATEWAY STUFF BELOW HERE********
-    
-    {
-      "apiVersion": "2017-03-01",
-      "name": "[variables('agentpublicAppGWName')]",
-      "type": "Microsoft.Network/applicationGateways",
-      "location": "[resourceGroup().location]",
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
         "[concat('Microsoft.Network/publicIPAddresses/', variables('agentpublicIPAddressName'))]"
@@ -854,14 +772,23 @@
         "sku": {
           "name": "[parameters('applicationGatewaySize')]",
           "tier": "WAF",
-          "capacity": "[parameters('capacity')]"
+          "capacity": "[parameters('applicationGatewayCapacity')]"
         },
+        "sslCertificates": [
+          {
+            "name": "appGatewaySslCert",
+            "properties": {
+              "data": "[parameters('sslCertificate')]",
+              "password": "1Password2"
+            }
+          }
+        ],
         "gatewayIPConfigurations": [
           {
             "name": "appGatewayIpConfig",
             "properties": {
               "subnet": {
-                "id": "[variables('agentpublicVnetSubnetID')]"
+                "id": "[variables('appGWSubnetID')]"
               }
             }
           }
@@ -871,7 +798,7 @@
             "name": "appGatewayFrontendIP",
             "properties": {
               "PublicIPAddress": {
-                "id": "[variables('publicIPRef')]"
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('agentpublicIPAddressName'))]"
               }
             }
           }
@@ -886,7 +813,7 @@
         ],
         "backendAddressPools": [
           {
-            "name": "[variables('agentpublicLbBackendPoolName')]"
+            "name": "[variables('agentpublicAppGWBackendPoolName')]"
           }
         ],
         "backendHttpSettingsCollection": [
@@ -895,7 +822,8 @@
             "properties": {
               "Port": 3000,
               "Protocol": "Http",
-              "CookieBasedAffinity": "Disabled"
+              "CookieBasedAffinity": "Enabled",
+              "Probe": { "id": "[concat(variables('agentpublicAppGWID'),'/probes/healthcheck')]" }
             }
           }
         ],
@@ -909,8 +837,12 @@
               "FrontendPort": {
                 "Id": "[concat(variables('agentpublicAppGWID'), '/frontendPorts/appGatewayFrontendPort')]"
               },
-              "Protocol": "Http2",
-              "SslCertificate": null
+              "Protocol": "Https",
+              "SslCertificate": {
+                "Id": "[concat(variables('agentpublicAppGWID'), '/sslCertificates/appGatewaySslCert')]"
+              },
+              "Hostname": "[parameters('appGWExtHostname')]",
+              "RequireServerNameIndication": "true"
             }
           }
         ],
@@ -923,11 +855,24 @@
                 "id": "[concat(variables('agentpublicAppGWID'), '/httpListeners/appGatewayHttpListener')]"
               },
               "backendAddressPool": {
-                "id": "[concat(variables('agentpublicAppGWID'), '/backendAddressPools/appGatewayBackendPool')]"
+                "id": "[concat(variables('agentpublicAppGWID'), '/backendAddressPools/', variables('agentpublicAppGWBackendPoolName'))]"
               },
               "backendHttpSettings": {
                 "id": "[concat(variables('agentpublicAppGWID'), '/backendHttpSettingsCollection/appGatewayBackendHttpSettings')]"
               }
+            }
+          }
+        ],
+        "probes": [
+          {
+            "name": "healthcheck",
+            "properties": {
+              "interval": "[variables('healthcheckinterval')]",
+              "host": "[parameters('appGWExtHostname')]",
+              "path": "/healthcheck",
+              "protocol": "http",
+              "timeout": "[variables('healthchecktimeout')]",
+              "unhealthyThreshold": "[variables('healthcheckthreshold')]"
             }
           }
         ],
@@ -940,10 +885,6 @@
         }
       }
     },
-
-
-    ********END OF APPLICATION GATEWAY STUFF********
-
     {
       "apiVersion": "[variables('apiVersionDefault')]",
       "dependsOn": [
@@ -954,7 +895,7 @@
         "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefixes')[mod(add(3,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(3,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentpublicAccountName'))]",
         "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefixes')[mod(add(4,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(4,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentpublicAccountName'))]",
         "[variables('vnetID')]",
-        "[variables('agentpublicLbID')]"
+        "[variables('agentpublicAppGWName')]"
       ],
       "location": "[variables('location')]",
       "name": "[concat(variables('agentpublicVMNamePrefix'), '-vmss')]",
@@ -974,7 +915,7 @@
                       "properties": {
                         "ApplicationGatewayBackendAddressPools": [
                           {
-                            "id": "[concat(variables('agentpublicAppGWName'), '/backendAddressPools/', variables('agentpublicLbBackendPoolName'))]"
+                            "id": "[concat(variables('agentpublicAppGWID'), '/backendAddressPools/', variables('agentpublicAppGWBackendPoolName'))]"
                           }
                         ],
                         "subnet": {
@@ -1046,8 +987,20 @@
       ],
       "location": "[variables('location')]",
       "name": "[variables('masterStorageAccountName')]",
+      "kind": "Storage", 
+      "sku": {
+        "name": "[variables('vmSizesMap')[variables('agentpublicVMSize')].storageAccountType]",
+        "tier": "Standard"
+      },
       "properties": {
-        "accountType": "[variables('vmSizesMap')[variables('masterVMSize')].storageAccountType]"
+        "encryption": {
+          "keySource": "Microsoft.Storage",
+          "services": {
+            "blob": {
+              "enabled": "true"
+            }
+          }
+        }
       },
       "type": "Microsoft.Storage/storageAccounts"
     },
@@ -1059,7 +1012,8 @@
         "addressSpace": {
           "addressPrefixes": [
             "[variables('masterSubnet')]",
-            "[variables('agentpublicSubnet')]"
+            "[variables('agentpublicSubnet')]",
+            "[variables('appGWSubnet')]"
           ]
         },
         "subnets": [
@@ -1073,6 +1027,12 @@
             "name": "[variables('agentpublicSubnetName')]",
             "properties": {
               "addressPrefix": "[variables('agentpublicSubnet')]"
+            }
+          },
+          {
+            "name": "[variables('appGWSubnetName')]",
+            "properties": {
+              "addressPrefix": "[variables('appGWSubnet')]"
             }
           }
         ]
@@ -1134,6 +1094,11 @@
         "[variables('masterLbID')]"
       ],
       "location": "[variables('location')]",
+      "tags": {
+        "Environment": "[parameters('environment-tag')]",
+        "Service": "[parameters('service-tag')]",
+        "Role": "Other"
+      },
       "name": "[concat(variables('masterLbName'), '/', 'SSH-', variables('masterVMNamePrefix'), copyIndex())]",
       "properties": {
         "backendPort": 22,
@@ -1174,7 +1139,8 @@
         "[variables('vnetID')]",
         "[variables('masterLbID')]",
         "[concat(variables('masterSshPort22InboundNatRuleIdPrefix'),'0')]",
-        "[concat(variables('masterSshInboundNatRuleIdPrefix'),copyIndex())]"
+        "[concat(variables('masterSshInboundNatRuleIdPrefix'),copyIndex())]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_sshaccessrestrict_name'))]"
       ],
       "location": "[variables('location')]",
       "name": "[concat(variables('masterVMNamePrefix'), 'nic-', copyIndex())]",
@@ -1196,7 +1162,10 @@
               }
             }
           }
-        ]
+        ],
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_sshaccessrestrict_name'))]"
+        }
       },
       "type": "Microsoft.Network/networkInterfaces"
     },
@@ -1312,7 +1281,7 @@
           "apiVersion": "[variables('sqlApiVersion')]",
           "location": "[resourceGroup().location]",
           "dependsOn": [
-            "[variables('stg-sql-db-1-name')]"
+            "[variables('db-server')]"
             ],
           "properties": {
             "edition": "[variables('sql-db-default-edition')]",
@@ -1340,19 +1309,72 @@
           "location": "[resourceGroup().location]",
           "apiVersion": "[variables('sqlApiVersion')]",
           "dependsOn": [
-            "[concat('Microsoft.Sql/servers/', variables('db-name'))]"
+            "[concat('Microsoft.Sql/servers/', variables('db-server'))]"
           ],
           "properties": {
             "startIpAddress": "0.0.0.0",
             "endIpAddress": "0.0.0.0"
           }
-        },
+        }
+      ]
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[parameters('networkSecurityGroups_sshaccessrestrict_name')]",
+      "apiVersion": "2016-03-30",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Environment": "[parameters('environment-tag')]",
+        "Service": "[parameters('service-tag')]",
+        "Role": "Other"
+      },
+      "properties": {
+          "securityRules": [
+              {
+                "name": "sshaccessKainos",
+                "properties": {
+                    "protocol": "TCP",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "2222",
+                    "sourceAddressPrefix": "195.89.171.5",
+                    "destinationAddressPrefix": "[parameters('masterSubnet')]",
+                    "access": "Allow",
+                    "priority": 100,
+                    "direction": "Inbound"
+                }
+              },
+              {
+                "name": "sshaccessStudio",
+                "properties": {
+                    "protocol": "TCP",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "2222",
+                    "sourceAddressPrefix": "217.33.148.210",
+                    "destinationAddressPrefix": "[parameters('masterSubnet')]",
+                    "access": "Allow",
+                    "priority": 110,
+                    "direction": "Inbound"
+                }
+              },
+              {
+                "name": "dockerswarmmgmtportstudioaccess",
+                "properties": {
+                    "protocol": "TCP",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "2200",
+                    "sourceAddressPrefix": "217.33.148.210",
+                    "destinationAddressPrefix": "[parameters('masterSubnet')]",
+                    "access": "Allow",
+                    "priority": 120,
+                    "direction": "Inbound"
+                }
+             }
+        ]
+      },
+      "dependsOn": []
+    },
   ],
   "outputs": {
-    "agentpublicFQDN": {
-      "type": "string",
-      "value": "[reference(concat('Microsoft.Network/publicIPAddresses/', variables('agentpublicIPAddressName'))).dnsSettings.fqdn]"
-    },
     "masterFQDN": {
       "type": "string",
       "value": "[reference(concat('Microsoft.Network/publicIPAddresses/', variables('masterPublicIPAddressName'))).dnsSettings.fqdn]"
