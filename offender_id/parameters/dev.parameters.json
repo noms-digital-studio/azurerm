@@ -1,0 +1,98 @@
+{
+  "agentpublicCount": {
+    "value": 3
+  },
+  "environment-tag": {
+    "value": "dev"
+  },
+  "agentpublicEndpointDNSNamePrefix": {
+    "value": "dev"
+  },
+  "appGWSubnet": {
+    "value": "10.1.0.0/24"
+  },
+  "agentpublicSubnet": {
+    "value": "10.0.0.0/24"
+  },
+  "agentpublicVMSize": {
+    "value": "Standard_D2_v2"
+  },
+  "firstConsecutiveStaticIP": {
+    "value": "172.16.0.5"
+  },
+  "linuxAdminUsername": {
+    "value": "master"
+  },
+  "location": {
+    "value": "ukwest"
+  },
+  "masterEndpointDNSNamePrefix": {
+    "value": "dev-master"
+  },
+  "masterSubnet": {
+    "value": "172.16.0.0/24"
+  },
+  "masterVMSize": {
+    "value": "Standard_D2_v2"
+  },
+  "sshRSAPublicKey": {
+    "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC2S9u3wM70ZQ3hVUEblnVMbOSUIp3Z2ju57CGE71MZOvPrp9FwNZjVeRiwzBmnu4lIV7vtBnDnBcPb92qxvYm9Rp2BE+N5u9mB2VX6/W8GeiqfmNiv1Mp7+Tj6+R99OpwbDx//l8sK/G7sWIEq8kB8TBXJoOw5BWO9M2jPA7NN9dFlIWtNuQjBB5vwMM5Cr6+GKhvCi9pLLh8mcq6BsViJUP7lLbPvYrEmlX4e+HQK48Gnu9pV9AMY380XazojuW7bge8sQCK9Cd3ja8VIbaS8da5BQ+97wmFTWKkIJy8yVGmtUq1CvETAh1JasucLG9AqjTNa7MD1u8D72S3LcH9n joemc@fisherkingblues.kainos.com"
+  },
+  "targetEnvironment": {
+    "value": "AzurePublicCloud"
+  },
+  "applicationGatewaySize": {
+    "value": "WAF_Medium"
+  },
+  "applicationGatewayCapacity": {
+    "value": 1
+  },
+  "applicationGatewayInstanceCount": {
+    "value": 1
+  },
+  "frontEndPort": {
+    "value": 443
+  },
+  "backEndPort": {
+    "value": 3000
+  },
+  "sslCertificate": {
+    "value": "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"
+  },
+  "sslCertificatePassword": {
+    "value": ""
+  },
+  "appGWExtHostname": {
+    "value": "offenders-api-dev.hmpps.dsd.io"
+  },
+  "diagnosticStorageSubscriptionID": {
+    "value": "c27cfedb-f5e9-45e6-9642-0fad1a5c94e7"
+  },
+  "diagnosticStorageAccountName": {
+    "value": "offendersapidevlogs"
+  },
+  "administratorLoginPassword": {
+    "value": ""
+  },
+  "logAnalyticsSubscriptionID": {
+    "value": "c27cfedb-f5e9-45e6-9642-0fad1a5c94e7"
+  },
+  "omsWorkspaceName": {
+    "value": "overwatch"
+  },
+  "omsWorkspaceID": {
+    "value": "be54afa6-5664-4b25-927f-0b11ef8e2926"
+  },
+  "omsWorkspaceKey": {
+    "value": "UAIn4+BTq2kbdUIagwU6+uXUcrtxZLXPEwtu1Pt6gw+XPOiPla5JgiAIqt78gklPV3yNfDmMJjUpMDDKQrbAfQ=="
+  },
+  "diagnosticResourceGroup": {
+    "value": "webops"
+  },
+  "resourceGroup": {
+    "value": "offenders-api-dev"
+  },
+  "networkSecurityGroups_sshaccessrestrict_name": {
+    "value": "restrictssh"
+  }
+}
