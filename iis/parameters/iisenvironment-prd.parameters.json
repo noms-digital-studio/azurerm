@@ -1,0 +1,97 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environment-tag": {
+            "value": "production"
+        },
+        "service-tag": {
+            "value": "iis"
+        },
+        "keyVaultName": {
+            "value": "iisvault"
+            },
+        "objectId": {
+          "value": "0a2d0466-eae2-4b57-a5c4-811d506142a6"
+        },
+        "keysPermissions": {
+          "value": [
+            "all"
+          ]
+        },
+        "secretsPermissions": {
+          "value": [
+            "all"
+          ]
+        },
+        "skuName": {
+          "value": "Standard"
+        },
+        "enableVaultForDeployment": {
+          "value": false
+        },
+        "enableVaultForDiskEncryption": {
+          "value": false
+        },
+        "enabledForTemplateDeployment": {
+          "value": false
+        },
+        "adminUsername": {
+            "value": "iisadmin"
+        },
+        "digital-Studio-public-IP": {
+            "value": "85.255.235.230"
+        },
+        "jumpboxAdminUsername": {
+            "value": "linuxadmin"
+        },
+        "sshUserName": {
+            "value": "iisaccess"
+        },
+        "sql-vm-size": {  
+            "value": "Standard_DS4_v2"
+        },
+        "vm-storage-account-type": {
+            "value": "Standard_LRS"
+        },
+        "sqlAutopatchingDayOfWeek": {
+            "value": "Sunday"
+        },
+        "sqlAutopatchingStartHour": {
+            "value": "2"
+        },
+        "sqlAutopatchingWindowDuration": {
+            "value": "60"
+        },
+        "paas-sqlAuthenticationLogin": {
+            "value": "iis-paas-sql-admin"
+        },
+        "vnetPrefix": {
+            "value": "10.0.0.0/24"
+        },
+        "sqlsubnetPrefix": {
+            "value": "10.0.0.0/24"
+        },
+        "sqlConnectivityType": {
+            "value": "Public"
+        },
+        "sqlPortNumber": {
+            "value": 1579
+        },
+        "sqlStorageDisksCount": {
+            "value": 2
+        },
+        "sqlStorageWorkloadType": {
+            "value": "GENERAL"
+        },
+        "sqlAutopatchingDayOfWeek": {
+            "value": "Sunday"
+        },
+        "sqlAutopatchingStartHour": {
+            "value": "2"
+        },
+        "sqlAutopatchingWindowDuration": {
+            "value": "60"
+        }
+    }
+}

@@ -1,0 +1,43 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environment-tag": {
+            "value": "production"
+        },
+        "adminUsername": {
+            "value": "iisadmin"
+        },
+        "paas-sqlAuthenticationLogin": {
+            "value": "iis-paas-sql-admin"
+        },
+        "service-tag": {
+            "value": "iis"
+        },
+        "keysPermissions": {
+          "value": [
+            "all"
+          ]
+        },
+        "secretsPermissions": {
+          "value": [
+            "all"
+          ]
+        },
+        "skuName": {
+          "value": "Standard"
+        },
+        "enableVaultForDeployment": {
+          "value": true
+        },
+        "enableVaultForDiskEncryption": {
+          "value": true
+        },
+        "enabledForTemplateDeployment": {
+          "value": true
+        },
+        "adminsshpublickey": {
+          "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDN30bXPerJCMi7Mex6KR4YwSSPavbPNL/T2sxr4wX2YzLuYH07jx0R25Z2x3kGGZvbKRaz3UzbEmFF7e8yWItUxLzX/nGmKz+e+JAZ70f7nOD+SnsXycZvRRHK/1fW32FcuAUJZjrmeDP4TL57ZsbiBeNzYqlEVKWCYRoXVflovuFI6qRVtKXpJr3KTVy/mmH7YsgF8hut/g6RG1kP4dUcKSoeNTHvMFPcfglpIZ8/+JICSoPyi7sgkJlrDxKUwKqh9xv5dQ/LGcrk+FAGP3PLJAeJ+0OGOyayTcAJEAcJbT4Y45Yslhhro7xGh9vLGg1EaqeHN4GzrJMKCtWg75rb joemc@fisherkingblues.kainos.com"
+        }
+    }
+}
