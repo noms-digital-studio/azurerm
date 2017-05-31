@@ -1,0 +1,488 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "{{ oms_location }}"
+        },
+        "resourcegroup": {
+            "type": "string",
+            "defaultValue": "{{ oms_resourceGroup }}"
+        },
+        "subscriptionId": {
+            "type": "string",
+            "defaultValue": "{{ oms_subscription }}"
+        },
+        "workspace": {
+            "type": "string",
+            "defaultValue": "{{ oms_workspaceName }}"
+        },
+        "workspaceapiversion": {
+            "type": "string",
+            "defaultValue": "2015-11-01-preview"
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "[parameters('workspaceapiversion')]",
+            "name": "[parameters('workspace')]",
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "location": "[parameters('location')]",
+            "id": "[Concat('/subscriptions/', parameters('subscriptionId'), '/resourceGroups/', parameters('resourcegroup'), '/providers/Microsoft.OperationalInsights/workspaces/', parameters('workspace'))]",
+            "resources": [
+                {
+                    "apiVersion": "2015-11-01-preview",
+                    "name": "Server Performance",
+                    "type": "views",
+                    "location": "[parameters('location')]",
+                    "id": "[Concat('/subscriptions/', parameters('subscriptionId'), '/resourceGroups/', parameters('resourcegroup'), '/providers/Microsoft.OperationalInsights/workspaces/', parameters('workspace'),'/views/Server Performance')]",
+                    "dependson": [
+                        "[Concat('/subscriptions/', parameters('subscriptionId'), '/resourceGroups/', parameters('resourcegroup'), '/providers/Microsoft.OperationalInsights/workspaces/', parameters('workspace'))]"
+                    ],
+                    "properties": {
+                        "Id": "Server Performance",
+                        "Name": "Server Performance",
+                        "Author": "cameron.fuller@catapultsystems.com",
+                        "Source": "Local",
+                        "Dashboard": [
+                            {
+                                "Id": "TwoNumberTileListBuilderBlade",
+                                "Type": "Blade",
+                                "Version": 0,
+                                "Configuration": {
+                                    "General": {
+                                        "title": "Data sent by Computer",
+                                        "newGroup": true,
+                                        "icon": "data:image/jpeg;base64,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",
+                                        "useIcon": false
+                                    },
+                                    "Tile": {
+                                        "Legend": "Computers sending data",
+                                        "Query": "MG:* | Measure Max(TimeGenerated) as LastData by Computer | where LastData>NOW-1HOURS"
+                                    },
+                                    "SecondTile": {
+                                        "Legend": "Computers not sending data",
+                                        "Query": "MG:* | Measure Max(TimeGenerated) as LastData by Computer | where LastData<NOW-1HOURS"
+                                    },
+                                    "List": {
+                                        "Query": "* | measure count() by Computer",
+                                        "HideGraph": false,
+                                        "enableSparklines": true,
+                                        "operation": "Summary",
+                                        "ColumnsTitle": {
+                                            "Name": "Computer",
+                                            "Value": "Data Sent to OMS"
+                                        },
+                                        "Color": "#0072c6",
+                                        "thresholds": {
+                                            "isEnabled": false,
+                                            "values": [
+                                                {
+                                                    "name": "Normal",
+                                                    "threshold": "Default",
+                                                    "color": "#009e49",
+                                                    "isDefault": true
+                                                },
+                                                {
+                                                    "name": "Warning",
+                                                    "threshold": "60",
+                                                    "color": "#fcd116",
+                                                    "isDefault": false
+                                                },
+                                                {
+                                                    "name": "Error",
+                                                    "threshold": "90",
+                                                    "color": "#ba141a",
+                                                    "isDefault": false
+                                                }
+                                            ]
+                                        },
+                                        "NameDSVSeparator": "",
+                                        "NavigationQuery": "{selected item}"
+                                    }
+                                }
+                            },
+                            {
+                                "Id": "LineChartBuilderBlade",
+                                "Type": "Blade",
+                                "Version": 0,
+                                "Configuration": {
+                                    "General": {
+                                        "title": "Processor Utilization",
+                                        "newGroup": true,
+                                        "icon": "",
+                                        "useIcon": false
+                                    },
+                                    "Header": {
+                                        "Title": "Processor over time",
+                                        "Subtitle": ""
+                                    },
+                                    "LineChart": {
+                                        "Query": "Type:Perf (ObjectName:Processor OR ObjectName:System) AND (CounterName=\"% Processor Time\") | measure avg(CounterValue) by Computer",
+                                        "yAxis": {
+                                            "isLogarithmic": false,
+                                            "units": {
+                                                "baseUnitType": "",
+                                                "baseUnit": "",
+                                                "displayUnit": ""
+                                            },
+                                            "customLabel": ""
+                                        }
+                                    },
+                                    "List": {
+                                        "Query": "Type:Perf (ObjectName:Processor OR ObjectName:System) AND (CounterName=\"% Processor Time\") | measure percentile90(CounterValue) by Computer",
+                                        "HideGraph": false,
+                                        "enableSparklines": true,
+                                        "operation": "Summary",
+                                        "ColumnsTitle": {
+                                            "Name": "Computer",
+                                            "Value": "% Utilization"
+                                        },
+                                        "Color": "#0072c6",
+                                        "thresholds": {
+                                            "isEnabled": true,
+                                            "values": [
+                                                {
+                                                    "name": "Normal",
+                                                    "threshold": "Default",
+                                                    "color": "#009e49",
+                                                    "isDefault": true
+                                                },
+                                                {
+                                                    "name": "Warning",
+                                                    "threshold": "90",
+                                                    "color": "#fcd116",
+                                                    "isDefault": false
+                                                },
+                                                {
+                                                    "name": "Error",
+                                                    "threshold": "95",
+                                                    "color": "#ba141a",
+                                                    "isDefault": false
+                                                }
+                                            ]
+                                        },
+                                        "NameDSVSeparator": "",
+                                        "NavigationQuery": "Type:Perf (ObjectName:Processor OR ObjectName:System) AND (CounterName=\"% Processor Time\") | measure percentile90(CounterValue) by Computer | Display StackedBarChart"
+                                    }
+                                }
+                            },
+                            {
+                                "Id": "LineChartBuilderBlade",
+                                "Type": "Blade",
+                                "Version": 0,
+                                "Configuration": {
+                                    "General": {
+                                        "title": "Disk Usage",
+                                        "newGroup": true,
+                                        "icon": "",
+                                        "useIcon": false
+                                    },
+                                    "Header": {
+                                        "Title": "Free Megabytes",
+                                        "Subtitle": ""
+                                    },
+                                    "LineChart": {
+                                        "Query": "Type:Perf  ((ObjectName:LogicalDisk AND CounterName:\"% Free Space\" )) | Measure avg(CounterValue) by Computer",
+                                        "yAxis": {
+                                            "isLogarithmic": false,
+                                            "units": {
+                                                "baseUnitType": "",
+                                                "baseUnit": "",
+                                                "displayUnit": ""
+                                            },
+                                            "customLabel": ""
+                                        }
+                                    },
+                                    "List": {
+                                        "Query": "Type:Perf  ((ObjectName:LogicalDisk AND CounterName:\"% Free Space\" AND  InstanceName<>\"_Total\")) | measure percentile90(CounterValue) as AvgFreeSpace by Computer,InstanceName | sort AvgFreeSpace",
+                                        "HideGraph": false,
+                                        "enableSparklines": false,
+                                        "operation": "Summary",
+                                        "ColumnsTitle": {
+                                            "Name": "Computer",
+                                            "Value": "Free Space"
+                                        },
+                                        "Color": "#0072c6",
+                                        "thresholds": {
+                                            "isEnabled": true,
+                                            "values": [
+                                                {
+                                                    "name": "Error",
+                                                    "threshold": "Default",
+                                                    "color": "#ba141a",
+                                                    "isDefault": true
+                                                },
+                                                {
+                                                    "name": "Warning",
+                                                    "threshold": "10",
+                                                    "color": "#fcd116",
+                                                    "isDefault": false
+                                                },
+                                                {
+                                                    "name": "Healthy",
+                                                    "threshold": "20",
+                                                    "color": "#007233",
+                                                    "isDefault": false
+                                                }
+                                            ]
+                                        },
+                                        "NameDSVSeparator": "",
+                                        "NavigationQuery": "Type:Perf  ((ObjectName:LogicalDisk AND CounterName:\"% Free Space\" AND  InstanceName!=\"_Total\")) | measure percentile90(CounterValue) as AvgFreeSpace by Computer,InstanceName | sort AvgFreeSpace | display StackedBarChart"
+                                    }
+                                }
+                            },
+                            {
+                                "Id": "LineChartBuilderBlade",
+                                "Type": "Blade",
+                                "Version": 0,
+                                "Configuration": {
+                                    "General": {
+                                        "title": "Memory",
+                                        "newGroup": true,
+                                        "icon": "",
+                                        "useIcon": false
+                                    },
+                                    "Header": {
+                                        "Title": "% Committed Bytes in Use",
+                                        "Subtitle": ""
+                                    },
+                                    "LineChart": {
+                                        "Query": "Type:Perf (ObjectName: Memory) AND (CounterName=\"% Committed Bytes In Use\") | Measure percentile90(CounterValue) by Computer",
+                                        "yAxis": {
+                                            "isLogarithmic": false,
+                                            "units": {
+                                                "baseUnitType": "",
+                                                "baseUnit": "",
+                                                "displayUnit": ""
+                                            },
+                                            "customLabel": ""
+                                        }
+                                    },
+                                    "List": {
+                                        "Query": "Type:Perf  ((ObjectName:Memory AND CounterName:\"Available MBytes\" )) | measure percentile90(CounterValue) as AvgFreeMemory by Computer | sort AvgFreeMemory",
+                                        "HideGraph": false,
+                                        "enableSparklines": false,
+                                        "operation": "Summary",
+                                        "ColumnsTitle": {
+                                            "Name": "Computer",
+                                            "Value": "% Committed Bytes in Use"
+                                        },
+                                        "Color": "#0072c6",
+                                        "thresholds": {
+                                            "isEnabled": true,
+                                            "values": [
+                                                {
+                                                    "name": "Error",
+                                                    "threshold": "Default",
+                                                    "color": "#ba141a",
+                                                    "isDefault": true
+                                                },
+                                                {
+                                                    "name": "Warning",
+                                                    "threshold": "2000",
+                                                    "color": "#fcd116",
+                                                    "isDefault": false
+                                                },
+                                                {
+                                                    "name": "Healthy",
+                                                    "threshold": "5000",
+                                                    "color": "#007233",
+                                                    "isDefault": false
+                                                }
+                                            ]
+                                        },
+                                        "NameDSVSeparator": "",
+                                        "NavigationQuery": "Type:Perf  ((ObjectName:Memory AND CounterName:\"Available MBytes\" )) | measure percentile90(CounterValue) as AvgFreeMemory by Computer | sort AvgFreeMemory  | Display StackedBarChart"
+                                    }
+                                }
+                            },
+                            {
+                                "Id": "SingleQueryDonutBuilderBladeV1",
+                                "Type": "Blade",
+                                "Version": 0,
+                                "Configuration": {
+                                    "General": {
+                                        "title": "Network Usage",
+                                        "newGroup": true,
+                                        "icon": "",
+                                        "useIcon": false
+                                    },
+                                    "Header": {
+                                        "Title": "Network traffic per computer",
+                                        "Subtitle": ""
+                                    },
+                                    "Donut": {
+                                        "Query": "Type:Perf (ObjectName=\"Network Interface\") (CounterName=\"Bytes Total/sec\")  | measure Avg(CounterValue) as BytesTotal by Computer",
+                                        "CenterLegend": {
+                                            "Text": "Total",
+                                            "Operation": "Sum",
+                                            "ArcsToSelect": []
+                                        },
+                                        "Options": {
+                                            "colors": [
+                                                "#00188f",
+                                                "#0072c6",
+                                                "#00bcf2"
+                                            ],
+                                            "valueColorMapping": []
+                                        }
+                                    },
+                                    "List": {
+                                        "Query": "Type:Perf (ObjectName=\"Network Interface\") (CounterName=\"Bytes Total/sec\") | measure Avg(CounterValue) as BytesTotal by Computer | Display StackedBarChart",
+                                        "HideGraph": false,
+                                        "enableSparklines": true,
+                                        "operation": "Summary",
+                                        "ColumnsTitle": {
+                                            "Name": "Computer",
+                                            "Value": "Packets Per Second"
+                                        },
+                                        "Color": "#0072c6",
+                                        "thresholds": {
+                                            "isEnabled": false,
+                                            "values": [
+                                                {
+                                                    "name": "Normal",
+                                                    "threshold": "Default",
+                                                    "color": "#009e49",
+                                                    "isDefault": true
+                                                },
+                                                {
+                                                    "name": "Warning",
+                                                    "threshold": "60",
+                                                    "color": "#fcd116",
+                                                    "isDefault": false
+                                                },
+                                                {
+                                                    "name": "Error",
+                                                    "threshold": "90",
+                                                    "color": "#ba141a",
+                                                    "isDefault": false
+                                                }
+                                            ]
+                                        },
+                                        "NameDSVSeparator": "",
+                                        "NavigationQuery": "Type:Perf (ObjectName=\"Network Interface\") (CounterName=\"Bytes Total/sec\") | measure Avg(CounterValue) as BytesTotal by Computer | Display StackedBarChart"
+                                    }
+                                }
+                            },
+                            {
+                                "Id": "LineChartCalloutStackedBuilderBlade",
+                                "Type": "Blade",
+                                "Version": 0,
+                                "Configuration": {
+                                    "General": {
+                                        "title": "Network Usage",
+                                        "newGroup": false
+                                    },
+                                    "charts": [
+                                        {
+                                            "Header": {
+                                                "Title": "Packets Received over time",
+                                                "Subtitle": ""
+                                            },
+                                            "LineChart": {
+                                                "Query": "Type:Perf (ObjectName=\"Network Adapter\") (CounterName=\"Bytes Received/sec\")  | measure Avg(CounterValue) as PacketsReceived by Computer",
+                                                "yAxis": {
+                                                    "isLogarithmic": false,
+                                                    "units": {
+                                                        "baseUnitType": "",
+                                                        "baseUnit": "",
+                                                        "displayUnit": ""
+                                                    },
+                                                    "customLabel": ""
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "Header": {
+                                                "Title": "Packets Sent over time",
+                                                "Subtitle": ""
+                                            },
+                                            "LineChart": {
+                                                "Query": "Type:Perf (ObjectName=\"Network Adapter\") (CounterName=\"Bytes Sent/sec\") | measure Avg(CounterValue) as PacketsSent by Computer",
+                                                "yAxis": {
+                                                    "isLogarithmic": false,
+                                                    "units": {
+                                                        "baseUnitType": "",
+                                                        "baseUnit": "",
+                                                        "displayUnit": ""
+                                                    },
+                                                    "customLabel": ""
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "Header": {
+                                                "Title": "Packets per second over time",
+                                                "Subtitle": ""
+                                            },
+                                            "LineChart": {
+                                                "Query": "Type:Perf (ObjectName=\"Network Interface\") (CounterName=\"Bytes Total/sec\") | measure Avg(CounterValue) as BytesTotal by Computer",
+                                                "yAxis": {
+                                                    "isLogarithmic": false,
+                                                    "units": {
+                                                        "baseUnitType": "",
+                                                        "baseUnit": "",
+                                                        "displayUnit": ""
+                                                    },
+                                                    "customLabel": ""
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ],
+                        "OverviewTile": {
+                            "Id": "DoubleNumberBuilderTile",
+                            "Type": "OverviewTile",
+                            "Version": 0,
+                            "Configuration": {
+                                "TileOne": {
+                                    "Legend": "Servers currently reporting to OMS",
+                                    "Query": "MG:* | Measure Max(TimeGenerated) as LastData by Computer | where LastData>NOW-1HOURS"
+                                },
+                                "TileTwo": {
+                                    "Legend": "Servers not currently reporting to OMS",
+                                    "Query": "MG:* | Measure Max(TimeGenerated) as LastData by Computer | where LastData<NOW-1HOURS"
+                                },
+                                "Advanced": {
+                                    "DataFlowVerification": {
+                                        "Enabled": false,
+                                        "Query": "*",
+                                        "Message": ""
+                                    }
+                                }
+                            },
+                            "Navigation": [
+                                {
+                                    "Host": "OMSPortal",
+                                    "Link": {
+                                        "Type": "Builder",
+                                        "Id": "Server Performance"
+                                    }
+                                },
+                                {
+                                    "Host": "Mobile",
+                                    "Link": {
+                                        "Type": "Builder",
+                                        "Id": "Server Performance"
+                                    }
+                                },
+                                {
+                                    "Host": "Azure",
+                                    "Link": {
+                                        "Type": "Builder",
+                                        "Id": "Server Performance"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,1454 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": { 
+      "workspaceName": {
+          "defaultValue": "{{ oms_workspaceName }}",
+          "type": "String",
+          "metadata": {
+            "description": "workspaceName"
+          }
+        },
+      "serviceTier": {
+          "defaultValue": "{{ oms_serviceTier }}",
+          "type": "String",
+          "metadata": {
+            "description": "serviceTier"
+          }
+        },
+      "location": {
+          "defaultValue": "{{ oms_location }}",
+          "type": "String",
+          "metadata": {
+            "description": "location"
+          }
+        }
+     },
+    "variables": {
+    "AntiMalware": {
+      "Name": "[concat('AntiMalware', '(', parameters('workspaceName'), ')')]",
+      "GalleryName": "AntiMalware"
+    },
+    "Security": {
+      "Name": "[concat('Security', '(', parameters('workspaceName'), ')')]",
+      "GalleryName": "Security"
+    },
+    "AgentHealthAssessment": {
+      "Name": "[concat('AgentHealthAssessment', '(', parameters('workspaceName'), ')')]",
+      "GalleryName": "AgentHealthAssessment"
+    },
+    "AzureActivity": {
+      "Name": "[concat('AzureActivity', '(', parameters('workspaceName'), ')')]",
+      "GalleryName": "AzureActivity"
+    },
+    "AlertManagement": {
+      "Name": "[concat('AlertManagement', '(', parameters('workspaceName'), ')')]",
+      "GalleryName": "AlertManagement"
+    },
+    "AzureNSGAnalytics": {
+      "Name": "[concat('AzureNSGAnalytics', '(', parameters('workspaceName'), ')')]",
+      "GalleryName": "AzureNSGAnalytics"
+    },
+    "KeyVaultAnalytics": {
+      "Name": "[concat('KeyVaultAnalytics', '(', parameters('workspaceName'), ')')]",
+      "GalleryName": "KeyVaultAnalytics"
+    },
+    "NetworkMonitoring": {
+      "Name": "[concat('NetworkMonitoring', '(', parameters('workspaceName'), ')')]",
+      "GalleryName": "NetworkMonitoring"
+    },
+    "ChangeTracking": {
+      "Name": "[concat('ChangeTracking', '(', parameters('workspaceName'), ')')]",
+      "GalleryName": "ChangeTracking"
+    },
+    "Updates": {
+      "Name": "[concat('Updates', '(', parameters('workspaceName'), ')')]",
+      "GalleryName": "Updates"
+    }
+    },
+    "resources": [ 
+	  {
+		"apiVersion": "2015-11-01-preview",
+      	"type": "Microsoft.OperationalInsights/workspaces",
+      	"name": "[parameters('workspaceName')]",
+      	"location": "[parameters('location')]",
+      	"properties": {
+         "sku": {
+          "Name": "[parameters('serviceTier')]"
+        }
+      	},
+        "resources": [
+        {
+          "apiVersion": "2015-11-01-preview",
+          "location": "[parameters('location')]",
+          "name": "[variables('AntiMalware').Name]",
+          "type": "Microsoft.OperationsManagement/solutions",
+          "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/', variables('AntiMalware').Name)]",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "properties": {
+            "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          },
+          "plan": {
+            "name": "[variables('AntiMalware').Name]",
+            "publisher": "Microsoft",
+            "product": "[Concat('OMSGallery/', variables('AntiMalware').GalleryName)]",
+            "promotionCode": ""
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "location": "[parameters('location')]",
+          "name": "[variables('Security').Name]",
+          "type": "Microsoft.OperationsManagement/solutions",
+          "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/', variables('Security').Name)]",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "properties": {
+            "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          },
+          "plan": {
+            "name": "[variables('Security').Name]",
+            "publisher": "Microsoft",
+            "product": "[Concat('OMSGallery/', variables('Security').GalleryName)]",
+            "promotionCode": ""
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "location": "[parameters('location')]",
+          "name": "[variables('AgentHealthAssessment').Name]",
+          "type": "Microsoft.OperationsManagement/solutions",
+          "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/', variables('AgentHealthAssessment').Name)]",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "properties": {
+            "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          },
+          "plan": {
+            "name": "[variables('AgentHealthAssessment').Name]",
+            "publisher": "Microsoft",
+            "product": "[Concat('OMSGallery/', variables('AgentHealthAssessment').GalleryName)]",
+            "promotionCode": ""
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "location": "[parameters('location')]",
+          "name": "[variables('AzureActivity').Name]",
+          "type": "Microsoft.OperationsManagement/solutions",
+          "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/', variables('AzureActivity').Name)]",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "properties": {
+            "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          },
+          "plan": {
+            "name": "[variables('AzureActivity').Name]",
+            "publisher": "Microsoft",
+            "product": "[Concat('OMSGallery/', variables('AzureActivity').GalleryName)]",
+            "promotionCode": ""
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "location": "[parameters('location')]",
+          "name": "[variables('AlertManagement').Name]",
+          "type": "Microsoft.OperationsManagement/solutions",
+          "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/', variables('AlertManagement').Name)]",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "properties": {
+            "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          },
+          "plan": {
+            "name": "[variables('AlertManagement').Name]",
+            "publisher": "Microsoft",
+            "product": "[Concat('OMSGallery/', variables('AlertManagement').GalleryName)]",
+            "promotionCode": ""
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "location": "[parameters('location')]",
+          "name": "[variables('AzureNSGAnalytics').Name]",
+          "type": "Microsoft.OperationsManagement/solutions",
+          "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/', variables('AzureNSGAnalytics').Name)]",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "properties": {
+            "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          },
+          "plan": {
+            "name": "[variables('AzureNSGAnalytics').Name]",
+            "publisher": "Microsoft",
+            "product": "[Concat('OMSGallery/', variables('AzureNSGAnalytics').GalleryName)]",
+            "promotionCode": ""
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "location": "[parameters('location')]",
+          "name": "[variables('KeyVaultAnalytics').Name]",
+          "type": "Microsoft.OperationsManagement/solutions",
+          "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/', variables('KeyVaultAnalytics').Name)]",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "properties": {
+            "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          },
+          "plan": {
+            "name": "[variables('KeyVaultAnalytics').Name]",
+            "publisher": "Microsoft",
+            "product": "[Concat('OMSGallery/', variables('KeyVaultAnalytics').GalleryName)]",
+            "promotionCode": ""
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "location": "[parameters('location')]",
+          "name": "[variables('NetworkMonitoring').Name]",
+          "type": "Microsoft.OperationsManagement/solutions",
+          "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/', variables('NetworkMonitoring').Name)]",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "properties": {
+            "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          },
+          "plan": {
+            "name": "[variables('NetworkMonitoring').Name]",
+            "publisher": "Microsoft",
+            "product": "[Concat('OMSGallery/', variables('NetworkMonitoring').GalleryName)]",
+            "promotionCode": ""
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "location": "[parameters('location')]",
+          "name": "[variables('ChangeTracking').Name]",
+          "type": "Microsoft.OperationsManagement/solutions",
+          "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/', variables('ChangeTracking').Name)]",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "properties": {
+            "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          },
+          "plan": {
+            "name": "[variables('ChangeTracking').Name]",
+            "publisher": "Microsoft",
+            "product": "[Concat('OMSGallery/', variables('ChangeTracking').GalleryName)]",
+            "promotionCode": ""
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "location": "[parameters('location')]",
+          "name": "[variables('Updates').Name]",
+          "type": "Microsoft.OperationsManagement/solutions",
+          "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/', variables('Updates').Name)]",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "properties": {
+            "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          },
+          "plan": {
+            "name": "[variables('Updates').Name]",
+            "publisher": "Microsoft",
+            "product": "[Concat('OMSGallery/', variables('Updates').GalleryName)]",
+            "promotionCode": ""
+          }
+        },
+        {
+          "name": "AzureActivityLog",
+          "type": "datasources",
+          "apiVersion": "2015-11-01-preview",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "AzureActivityLog",
+          "properties": {
+              "linkedResourceId": "[concat(subscription().id, '/providers/Microsoft.Insights/eventTypes/management')]"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "System",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "WindowsEvent",
+          "properties": {
+              "eventLogName": "System",
+              "eventTypes": [
+                  {
+                    "eventType": "Error"
+                  },
+                  {
+                  "eventType": "Warning"
+                  },
+                  {
+                  "eventType": "Information"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Application",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "WindowsEvent",
+          "properties": {
+              "eventLogName": "Application",
+              "eventTypes": [
+                  {
+                    "eventType": "Error"
+                  },
+                  {
+                  "eventType": "Warning"
+                  },
+                  {
+                  "eventType": "Information"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Setup",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "WindowsEvent",
+          "properties": {
+              "eventLogName": "Setup",
+              "eventTypes": [
+                  {
+                    "eventType": "Error"
+                  },
+                  {
+                  "eventType": "Warning"
+                  },
+                  {
+                  "eventType": "Information"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "LogicalDisk1",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+              "objectName": "LogicalDisk",
+              "instanceName": "*",
+              "intervalSeconds": 10,
+              "counterName": "Avg Disk sec/Read"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "LogicalDisk2",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+              "objectName": "LogicalDisk",
+              "instanceName": "*",
+              "intervalSeconds": 10,
+              "counterName": "Avg Disk sec/Write"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "LogicalDisk3",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+              "objectName": "LogicalDisk",
+              "instanceName": "*",
+              "intervalSeconds": 10,
+              "counterName": "Current Disk Queue Lenght"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "LogicalDisk4",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+              "objectName": "LogicalDisk",
+              "instanceName": "*",
+              "intervalSeconds": 10,
+              "counterName": "Disk Reads/sec"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "LogicalDisk5",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+              "objectName": "LogicalDisk",
+              "instanceName": "*",
+              "intervalSeconds": 10,
+              "counterName": "Disk Transfers/sec"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "LogicalDisk6",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+              "objectName": "LogicalDisk",
+              "instanceName": "*",
+              "intervalSeconds": 10,
+              "counterName": "Disk Writes/sec"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "LogicalDisk7",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+              "objectName": "LogicalDisk",
+              "instanceName": "*",
+              "intervalSeconds": 10,
+              "counterName": "Free Megabytes"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "LogicalDisk8",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+              "objectName": "LogicalDisk",
+              "instanceName": "*",
+              "intervalSeconds": 10,
+              "counterName": "% Free Space"
+          }
+        },
+
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Memory1",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+              "objectName": "Memory",
+              "instanceName": "*",
+              "intervalSeconds": 10,
+              "counterName": "Available MBytes"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Memory2",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+              "objectName": "Memory",
+              "instanceName": "*",
+              "intervalSeconds": 10,
+              "counterName": "% Committed Bytes In Use"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Network1",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+              "objectName": "Network Adapter",
+              "instanceName": "*",
+              "intervalSeconds": 10,
+              "counterName": "Bytes Received/sec"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Network2",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+              "objectName": "Network Adapter",
+              "instanceName": "*",
+              "intervalSeconds": 10,
+              "counterName": "Bytes Sent/sec"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Network3",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+              "objectName": "Network Adapter",
+              "instanceName": "*",
+              "intervalSeconds": 10,
+              "counterName": "Bytes Total/sec"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "CPU1",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+              "objectName": "Processor",
+              "instanceName": "_Total",
+              "intervalSeconds": 10,
+              "counterName": "% Processor Time"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "CPU2",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+              "objectName": "System",
+              "instanceName": "*",
+              "intervalSeconds": 10,
+              "counterName": "Processor Queue Lenght"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "LinuxPerformanceLogicalDisk",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxPerformanceObject",
+          "properties": {
+              "performanceCounters": [
+                  {
+                      "counterName": "% Used Inodes"
+                  },
+                  {
+                      "counterName": "Free Megabytes"
+                  },
+                  {
+                      "counterName": "% Used Space"
+                  },
+                  {
+                      "counterName": "Disk Transfers/sec"
+                  },
+                  {
+                      "counterName": "Disk Reads/sec"
+                  },
+                  {
+                      "counterName": "Disk Writes/sec"
+                  }
+              ],
+              "objectName": "Logical Disk",
+              "instanceName": "*",
+              "intervalSeconds": 10
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "LinuxPerformanceMemory",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxPerformanceObject",
+          "properties": {
+              "performanceCounters": [
+                  {
+                      "counterName": "Available MBytes Memory"
+                  },
+                  {
+                      "counterName": "% Used Memory"
+                  },
+                  {
+                      "counterName": "% Used Swap Space"
+                  }
+              ],
+              "objectName": "Memory",
+              "instanceName": "*",
+              "intervalSeconds": 10
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "LinuxPerformanceNetwork",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxPerformanceObject",
+          "properties": {
+              "performanceCounters": [
+                  {
+                      "counterName": "Total Bytes Transmitted"
+                  },
+                  {
+                      "counterName": "Total Bytes Received"
+                  },
+                  {
+                      "counterName": "Total Bytes"
+                  },
+                  {
+                      "counterName": "Total Packets Transmitted"
+                  },
+                  {
+                      "counterName": "Total Packets Received"
+                  }
+              ],
+              "objectName": "Network",
+              "instanceName": "*",
+              "intervalSeconds": 10
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "LinuxPerformanceProcessor",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxPerformanceObject",
+          "properties": {
+              "performanceCounters": [
+                  {
+                      "counterName": "% Processor Time"
+                  },
+                  {
+                      "counterName": "% Privileged Time"
+                  }
+              ],
+              "objectName": "Processor",
+              "instanceName": "*",
+              "intervalSeconds": 10
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Syslog1",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+              "syslogName": "auth",
+              "syslogSeverities": [
+                  {
+                      "severity": "emerg"
+                  },
+                  {
+                      "severity": "alert"
+                  },
+                  {
+                      "severity": "crit"
+                  },
+                  {
+                      "severity": "err"
+                  },
+                  {
+                      "severity": "warning"
+                  },
+                  {
+                      "severity": "notice"
+                  },
+                  {
+                      "severity": "info"
+                  },
+                  {
+                      "severity": "debug"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Syslog2",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+              "syslogName": "authpriv",
+              "syslogSeverities": [
+                  {
+                      "severity": "emerg"
+                  },
+                  {
+                      "severity": "alert"
+                  },
+                  {
+                      "severity": "crit"
+                  },
+                  {
+                      "severity": "err"
+                  },
+                  {
+                      "severity": "warning"
+                  },
+                  {
+                      "severity": "notice"
+                  },
+                  {
+                      "severity": "info"
+                  },
+                  {
+                      "severity": "debug"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Syslog3",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+              "syslogName": "cron",
+              "syslogSeverities": [
+                  {
+                      "severity": "emerg"
+                  },
+                  {
+                      "severity": "alert"
+                  },
+                  {
+                      "severity": "crit"
+                  },
+                  {
+                      "severity": "err"
+                  },
+                  {
+                      "severity": "warning"
+                  },
+                  {
+                      "severity": "notice"
+                  },
+                  {
+                      "severity": "info"
+                  },
+                  {
+                      "severity": "debug"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Syslog4",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+              "syslogName": "daemon",
+              "syslogSeverities": [
+                  {
+                      "severity": "emerg"
+                  },
+                  {
+                      "severity": "alert"
+                  },
+                  {
+                      "severity": "crit"
+                  },
+                  {
+                      "severity": "err"
+                  },
+                  {
+                      "severity": "warning"
+                  },
+                  {
+                      "severity": "notice"
+                  },
+                  {
+                      "severity": "info"
+                  },
+                  {
+                      "severity": "debug"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Syslog5",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+              "syslogName": "ftp",
+              "syslogSeverities": [
+                  {
+                      "severity": "emerg"
+                  },
+                  {
+                      "severity": "alert"
+                  },
+                  {
+                      "severity": "crit"
+                  },
+                  {
+                      "severity": "err"
+                  },
+                  {
+                      "severity": "warning"
+                  },
+                  {
+                      "severity": "notice"
+                  },
+                  {
+                      "severity": "info"
+                  },
+                  {
+                      "severity": "debug"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Syslog6",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+              "syslogName": "kern",
+              "syslogSeverities": [
+                  {
+                      "severity": "emerg"
+                  },
+                  {
+                      "severity": "alert"
+                  },
+                  {
+                      "severity": "crit"
+                  },
+                  {
+                      "severity": "err"
+                  },
+                  {
+                      "severity": "warning"
+                  },
+                  {
+                      "severity": "notice"
+                  },
+                  {
+                      "severity": "info"
+                  },
+                  {
+                      "severity": "debug"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Syslog7",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+              "syslogName": "local0",
+              "syslogSeverities": [
+                  {
+                      "severity": "emerg"
+                  },
+                  {
+                      "severity": "alert"
+                  },
+                  {
+                      "severity": "crit"
+                  },
+                  {
+                      "severity": "err"
+                  },
+                  {
+                      "severity": "warning"
+                  },
+                  {
+                      "severity": "notice"
+                  },
+                  {
+                      "severity": "info"
+                  },
+                  {
+                      "severity": "debug"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Syslog8",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+              "syslogName": "local1",
+              "syslogSeverities": [
+                  {
+                      "severity": "emerg"
+                  },
+                  {
+                      "severity": "alert"
+                  },
+                  {
+                      "severity": "crit"
+                  },
+                  {
+                      "severity": "err"
+                  },
+                  {
+                      "severity": "warning"
+                  },
+                  {
+                      "severity": "notice"
+                  },
+                  {
+                      "severity": "info"
+                  },
+                  {
+                      "severity": "debug"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Syslog9",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+              "syslogName": "local2",
+              "syslogSeverities": [
+                  {
+                      "severity": "emerg"
+                  },
+                  {
+                      "severity": "alert"
+                  },
+                  {
+                      "severity": "crit"
+                  },
+                  {
+                      "severity": "err"
+                  },
+                  {
+                      "severity": "warning"
+                  },
+                  {
+                      "severity": "notice"
+                  },
+                  {
+                      "severity": "info"
+                  },
+                  {
+                      "severity": "debug"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Syslog10",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+              "syslogName": "local3",
+              "syslogSeverities": [
+                  {
+                      "severity": "emerg"
+                  },
+                  {
+                      "severity": "alert"
+                  },
+                  {
+                      "severity": "crit"
+                  },
+                  {
+                      "severity": "err"
+                  },
+                  {
+                      "severity": "warning"
+                  },
+                  {
+                      "severity": "notice"
+                  },
+                  {
+                      "severity": "info"
+                  },
+                  {
+                      "severity": "debug"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Syslog11",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+              "syslogName": "local4",
+              "syslogSeverities": [
+                  {
+                      "severity": "emerg"
+                  },
+                  {
+                      "severity": "alert"
+                  },
+                  {
+                      "severity": "crit"
+                  },
+                  {
+                      "severity": "err"
+                  },
+                  {
+                      "severity": "warning"
+                  },
+                  {
+                      "severity": "notice"
+                  },
+                  {
+                      "severity": "info"
+                  },
+                  {
+                      "severity": "debug"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Syslog12",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+              "syslogName": "local5",
+              "syslogSeverities": [
+                  {
+                      "severity": "emerg"
+                  },
+                  {
+                      "severity": "alert"
+                  },
+                  {
+                      "severity": "crit"
+                  },
+                  {
+                      "severity": "err"
+                  },
+                  {
+                      "severity": "warning"
+                  },
+                  {
+                      "severity": "notice"
+                  },
+                  {
+                      "severity": "info"
+                  },
+                  {
+                      "severity": "debug"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Syslog13",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+              "syslogName": "local6",
+              "syslogSeverities": [
+                  {
+                      "severity": "emerg"
+                  },
+                  {
+                      "severity": "alert"
+                  },
+                  {
+                      "severity": "crit"
+                  },
+                  {
+                      "severity": "err"
+                  },
+                  {
+                      "severity": "warning"
+                  },
+                  {
+                      "severity": "notice"
+                  },
+                  {
+                      "severity": "info"
+                  },
+                  {
+                      "severity": "debug"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Syslog14",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+              "syslogName": "local7",
+              "syslogSeverities": [
+                  {
+                      "severity": "emerg"
+                  },
+                  {
+                      "severity": "alert"
+                  },
+                  {
+                      "severity": "crit"
+                  },
+                  {
+                      "severity": "err"
+                  },
+                  {
+                      "severity": "warning"
+                  },
+                  {
+                      "severity": "notice"
+                  },
+                  {
+                      "severity": "info"
+                  },
+                  {
+                      "severity": "debug"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Syslog15",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+              "syslogName": "lpr",
+              "syslogSeverities": [
+                  {
+                      "severity": "emerg"
+                  },
+                  {
+                      "severity": "alert"
+                  },
+                  {
+                      "severity": "crit"
+                  },
+                  {
+                      "severity": "err"
+                  },
+                  {
+                      "severity": "warning"
+                  },
+                  {
+                      "severity": "notice"
+                  },
+                  {
+                      "severity": "info"
+                  },
+                  {
+                      "severity": "debug"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Syslog16",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+              "syslogName": "mail",
+              "syslogSeverities": [
+                  {
+                      "severity": "emerg"
+                  },
+                  {
+                      "severity": "alert"
+                  },
+                  {
+                      "severity": "crit"
+                  },
+                  {
+                      "severity": "err"
+                  },
+                  {
+                      "severity": "warning"
+                  },
+                  {
+                      "severity": "notice"
+                  },
+                  {
+                      "severity": "info"
+                  },
+                  {
+                      "severity": "debug"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Syslog17",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+              "syslogName": "news",
+              "syslogSeverities": [
+                  {
+                      "severity": "emerg"
+                  },
+                  {
+                      "severity": "alert"
+                  },
+                  {
+                      "severity": "crit"
+                  },
+                  {
+                      "severity": "err"
+                  },
+                  {
+                      "severity": "warning"
+                  },
+                  {
+                      "severity": "notice"
+                  },
+                  {
+                      "severity": "info"
+                  },
+                  {
+                      "severity": "debug"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Syslog18",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+              "syslogName": "syslog",
+              "syslogSeverities": [
+                  {
+                      "severity": "emerg"
+                  },
+                  {
+                      "severity": "alert"
+                  },
+                  {
+                      "severity": "crit"
+                  },
+                  {
+                      "severity": "err"
+                  },
+                  {
+                      "severity": "warning"
+                  },
+                  {
+                      "severity": "notice"
+                  },
+                  {
+                      "severity": "info"
+                  },
+                  {
+                      "severity": "debug"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Syslog19",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+              "syslogName": "user",
+              "syslogSeverities": [
+                  {
+                      "severity": "emerg"
+                  },
+                  {
+                      "severity": "alert"
+                  },
+                  {
+                      "severity": "crit"
+                  },
+                  {
+                      "severity": "err"
+                  },
+                  {
+                      "severity": "warning"
+                  },
+                  {
+                      "severity": "notice"
+                  },
+                  {
+                      "severity": "info"
+                  },
+                  {
+                      "severity": "debug"
+                  }
+              ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "Syslog20",
+          "dependsOn": [
+              "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+              "syslogName": "uucp",
+              "syslogSeverities": [
+                  {
+                      "severity": "emerg"
+                  },
+                  {
+                      "severity": "alert"
+                  },
+                  {
+                      "severity": "crit"
+                  },
+                  {
+                      "severity": "err"
+                  },
+                  {
+                      "severity": "warning"
+                  },
+                  {
+                      "severity": "notice"
+                  },
+                  {
+                      "severity": "info"
+                  },
+                  {
+                      "severity": "debug"
+                  }
+              ]
+          }
+        }
+        ]
+  	}
+    ],
+    "outputs": {  }
+}
