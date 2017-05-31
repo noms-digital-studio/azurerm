@@ -1,0 +1,31 @@
+---
+
+  - name: Deploy RM Templates
+    azure_rm_deployment:
+      state: present
+      resource_group_name: "{{ oms_resourceGroup }}"
+      location: "{{ oms_resourceGroupLocation }}"
+      template: "{{ item.template_location }}"
+      deployment_mode: incremental
+    with_items:
+      - "{{ oms_deployment }}"
+
+  - name: Deploy Storage Analytics Solution
+    azure_rm_deployment:
+      state: present
+      resource_group_name: "{{ oms_resourceGroup }}"
+      location: "{{ oms_resourceGroupLocation }}"
+      template: "{{ lookup('template', '../armtemplate/arm_oms_storage_analytics_solution.json.j2') }}"
+      deployment_mode: incremental
+    tags:
+      - storageanalytics
+
+  - name: Deploy OMS Alert
+    azure_rm_deployment:
+      state: present
+      resource_group_name: "{{ oms_resourceGroup }}"
+      location: "{{ oms_resourceGroupLocation }}"
+      template: "{{ lookup('template', '../armtemplate/arm_oms_alert.json.j2') }}"
+      deployment_mode: incremental
+    with_items:
+      - "{{ alert }}"

@@ -1,0 +1,164 @@
+---
+
+oms_resourceGroup: LogA_HPE_PoC
+oms_resourceGroupLocation: UK West
+
+oms_workspaceName: LogA-HPE-PoC
+oms_location: West Europe
+oms_serviceTier: Free
+oms_subscription: 5d8bf94e-f520-4d04-b9c5-a3a9f4735a26
+
+oms_automationAccount: PoC-OMS-Automation-Acct
+oms_automationAccountLocation: West Europe
+ingestSchedulerGuid: 6daa7b65-0756-4756-a679-36b27e5a660e
+ingestCleanupGuid: 75e3670a-f5b7-4743-87e4-c65397b6a374
+
+oms_deployment:
+  - name: Deploy OMS
+    template_location: "{{ lookup('template', '../armtemplate/arm_oms.json.j2') }}"
+  - name: Deploy Free Tier OMS Dashboard
+    template_location: "{{ lookup('template', '../armtemplate/arm_oms_dashboard_freetier.json.j2') }}"
+  - name: Deploy Server Perfromance Dashboard
+    template_location: "{{ lookup('template', '../armtemplate/arm_oms_dahsboard_serverperformance.json.j2') }}"
+    
+alert:
+  - name: CPU Utilization Warning
+    alertName: CPU_Utilization_Warning
+    query: (Type=Perf) (ObjectName=Processor) (CounterName=\"% Processor Time\") (InstanceName=_Total) AND CounterValue>50 and TimeGenerated>NOW-10MINUTES
+    category: Utilization
+    description: Alert if CPU Utilization above 50%
+    severity: warning
+    recipients: b.arokiadoss@kainos.com","P.Taylor@kainos.com
+  - name: CPU Utilization Error
+    alertName: CPU_Utilization_Error
+    query: (Type=Perf) (ObjectName=Processor) (CounterName=\"% Processor Time\") (InstanceName=_Total) AND CounterValue>90 and TimeGenerated>NOW-10MINUTES
+    category: Utilization
+    description: Alert if CPU Utilization above 90%
+    severity: Critical
+    recipients: b.arokiadoss@kainos.com","P.Taylor@kainos.com
+  - name: Memory Utilization Warning
+    alertName: Memory_Utilization_Warning
+    query: (Type=Perf) (ObjectName=Memory) (CounterName=\"% Used Memory\" or \"% Committed Bytes In Use\") AND CounterValue>80 and TimeGenerated>NOW-10MINUTES
+    category: Utilization
+    description: Alert if Memory Utilization above 80%
+    severity: warning
+    recipients: b.arokiadoss@kainos.com","P.Taylor@kainos.com
+  - name: Memory Utilization Error
+    alertName: Memory_Utilization_Error
+    query: (Type=Perf) (ObjectName=Memory) (CounterName=\"% Used Memory\" or \"% Committed Bytes In Use\") AND CounterValue>90 and TimeGenerated>NOW-10MINUTES
+    category: Utilization
+    description: Alert if Memory Utilization above 90%
+    severity: Critical
+    recipients: b.arokiadoss@kainos.com","P.Taylor@kainos.com
+  - name: Windows Disk Utilization Warning
+    alertName: Windows_Disk_Utilization_Warning
+    query: (Type=Perf) (ObjectName=LogicalDisk) (CounterName=\"% Free Space\") (InstanceName=\"C:\") AND CounterValue<85 and TimeGenerated>NOW-10MINUTES
+    category: Utilization
+    description: Alert if Disk Utilization above 85%
+    severity: warning
+    recipients: b.arokiadoss@kainos.com","P.Taylor@kainos.com
+  - name: Windows Disk Utilization Error
+    alertName: Windows_Disk_Utilization_Error
+    query: (Type=Perf) (ObjectName=LogicalDisk) (CounterName=\"% Free Space\") (InstanceName=\"C:\") AND CounterValue<95 and TimeGenerated>NOW-10MINUTES
+    category: Utilization
+    description: Alert if Disk Utilization above 95%
+    severity: warning
+    recipients: b.arokiadoss@kainos.com","P.Taylor@kainos.com
+  - name: Linux Disk Utilization root Warning
+    alertName: Linux_Disk_Utilization_root_Warning
+    query: (Type=Perf) (ObjectName=\"Logical Disk\") (CounterName=\"% Used Space\") (InstanceName=\"/\") AND CounterValue>85 and TimeGenerated>NOW-10MINUTES
+    category: Utilization
+    description: Alert if root Disk Utilization above 85%
+    severity: warning
+    recipients: b.arokiadoss@kainos.com","P.Taylor@kainos.com
+  - name: Linux Disk Utilization root Error
+    alertName: Linux_Disk_Utilization_root_Error
+    query: (Type=Perf) (ObjectName=\"Logical Disk\") (CounterName=\"% Used Space\") (InstanceName=\"/\") AND CounterValue>95 and TimeGenerated>NOW-10MINUTES
+    category: Utilization
+    description: Alert if root Disk Utilization above 95%
+    severity: Critical
+    recipients: b.arokiadoss@kainos.com","P.Taylor@kainos.com
+  - name: Linux Disk Utilization var Warning
+    alertName: Linux_Disk_Utilization_var_Warning
+    query: (Type=Perf) (ObjectName=\"Logical Disk\") (CounterName=\"% Used Space\") (InstanceName=\"/var\") AND CounterValue>85 and TimeGenerated>NOW-10MINUTES
+    category: Utilization
+    description: Alert if var Disk Utilization above 85%
+    severity: warning
+    recipients: b.arokiadoss@kainos.com","P.Taylor@kainos.com
+  - name: Linux Disk Utilization var Error
+    alertName: Linux_Disk_Utilization_var_Error
+    query: (Type=Perf) (ObjectName=\"Logical Disk\") (CounterName=\"% Used Space\") (InstanceName=\"/var\") AND CounterValue>95 and TimeGenerated>NOW-10MINUTES
+    category: Utilization
+    description: Alert if var Disk Utilization above 95%
+    severity: Critical
+    recipients: b.arokiadoss@kainos.com","P.Taylor@kainos.com
+  - name: Linux Disk Utilization u01 Warning
+    alertName: Linux_Disk_Utilization_u01_Warning
+    query: (Type=Perf) (ObjectName=\"Logical Disk\") (CounterName=\"% Used Space\") (InstanceName=\"/u01\") AND CounterValue>85 and TimeGenerated>NOW-10MINUTES
+    category: Utilization
+    description: Alert if u01 Disk Utilization above 85%
+    severity: warning
+    recipients: b.arokiadoss@kainos.com","P.Taylor@kainos.com
+  - name: Linux Disk Utilization u01 Error
+    alertName: Linux_Disk_Utilization_u01_Error
+    query: (Type=Perf) (ObjectName=\"Logical Disk\") (CounterName=\"% Used Space\") (InstanceName=\"/u01\") AND CounterValue>95 and TimeGenerated>NOW-10MINUTES
+    category: Utilization
+    description: Alert if u01 Disk Utilization above 95%
+    severity: Critical
+    recipients: b.arokiadoss@kainos.com","P.Taylor@kainos.com
+  - name: Network Security Groups Changes
+    alertName: Network_Security_Groups_Changes
+    query: (Type=AzureActivity) (OperationName=\"Microsoft.Network/networkSecurityGroups/write\" OR OperationName=\"Microsoft.Network/networkSecurityGroups/delete\") and TimeGenerated>NOW-10MINUTES
+    category: AzureActivity
+    description: Alert if any changes to Network Security Groups
+    severity: Informational
+    recipients: b.arokiadoss@kainos.com","P.Taylor@kainos.com
+  - name: Windows Defender Definition Update
+    alertName: Windows_Defender_Definition_Update
+    query: (Type=Event) \"Installation Started':' Windows has started installing the following update':' Definition Update for Windows Defender\" and TimeGenerated>NOW-10MINUTES
+    category: Protection
+    description: Alert if any changes to Windows Defender Definition
+    severity: Informational
+    recipients: b.arokiadoss@kainos.com","P.Taylor@kainos.com
+  - name: Windows Threat Detected
+    alertName: Windows_Threat_Detected_Alert
+    query: (Type=ProtectionStatus) ThreatStatusRank != 150 ThreatStatusRank != 470 and TimeGenerated>NOW-10MINUTES
+    category: Protection
+    description: Alert if any threat detected
+    severity: Critical
+    recipients: b.arokiadoss@kainos.com","P.Taylor@kainos.com
+  - name: Linux ClamAV Definition Update
+    alertName: Linux_ClamAV_Definition_Update
+    query: (Type=freshclamlog_CL) Database updated and TimeGenerated>NOW-10MINUTES
+    category: Protection
+    description: Alert if any changes to CLAMAV database
+    severity: Informational
+    recipients: b.arokiadoss@kainos.com","P.Taylor@kainos.com
+  - name: Linux Threat Detected
+    alertName: Linux_Threat_Detected
+    query: (Type=clamavlog_CL) Found and TimeGenerated>NOW-10MINUTES
+    category: Protection
+    description: Alert if any threat detected
+    severity: Critical
+    recipients: b.arokiadoss@kainos.com","P.Taylor@kainos.com
+  - name: Linux Critical Syslog
+    alertName: Linux_Critical_Syslog
+    query: (Type=Syslog)(SeverityLevel=crit) and TimeGenerated>NOW-10MINUTES
+    category: System_Messages
+    description: Alert for critical syslog message 
+    severity: Critical
+    recipients: b.arokiadoss@kainos.com","P.Taylor@kainos.com
+  - name: Linux User Authentication Failures
+    alertName: Linux_User_Authentication_Failures
+    query: (Facility=authpriv) \"authentication failure\" or \"invalid user\" or \"Too many authentication failures\" and TimeGenerated>NOW-10MINUTES
+    category: System_Messages
+    description: Alert for Linux User Authentication Failures 
+    severity: Informational
+    recipients: b.arokiadoss@kainos.com","P.Taylor@kainos.com
+  - name: Windows User Authentication Failures
+    alertName: Windows_User_Authentication_Failures
+    query: (Type=SecurityEvent)(AccountType=user)(EventID=4625) and TimeGenerated>NOW-10MINUTES
+    category: System_Messages
+    description: Alert for Windows User Authentication Failures 
+    severity: Informational
+    recipients: b.arokiadoss@kainos.com","P.Taylor@kainos.com
